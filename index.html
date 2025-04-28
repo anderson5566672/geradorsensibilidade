@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Sensibilidade</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  #particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 30px;
+    border-radius: 15px;
+    border: 1px solid #ffffff50;
+    box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.2);
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    margin: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+  }
+
+  .menu-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    gap: 10px;
+  }
+
+  .menu-buttons button {
+    background-color: transparent;
+    border: 2px solid white;
+    color: white;
+    font-size: 16px;
+    padding: 10px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    flex: 1;
+    transition: all 0.3s;
+  }
+
+  .menu-buttons button:hover,
+  .menu-buttons button.active {
+    background-color: white;
+    color: black;
+  }
+
+  select, input[type="text"], button.action {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 8px;
+    background-color: #111;
+    color: white;
+    border: 1px solid #ffffff50;
+    font-size: 14px;
+  }
+
+  button.action {
+    background-color: transparent;
+    border: 2px solid white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  button.action:hover {
+    background-color: white;
+    color: black;
+  }
+
+  .resultado, .auxilios {
+    background-color: #111;
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ffffff50;
+    border-radius: 8px;
+    font-size: 14px;
+    display: none;
+    text-align: left;
+  }
+
+  .auxilios label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 10px;
+    font-size: 14px;
+  }
+
+  .auxilios input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    appearance: none;
+    background-color: black;
+    border: 2px solid white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .auxilios input[type="checkbox"]:checked {
+    background-color: white;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: white;
+  }
+
+  h2 {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: gray;
+  }
+
+  .progress-bar {
+    width: 100%;
+    background-color: #333;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .progress-bar-inner {
+    height: 10px;
+    width: 0;
+    background-color: #fff;
+    transition: width 3s linear;
+  }
+
+  .injection-message {
+    margin-top: 15px;
+    color: #ffffff;
+    font-weight: bold;
+    display: none;
+    text-align: center;
+  }
+
+  .creditos {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    color: gray;
+    z-index: 1;
+  }
+
+  .creditos a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .creditos a:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="particles-js"></div>
+
+<div class="container">
+  <h1>Sensibilidade / Auxílio</h1>
+  <h2>Configure a sensibilidade para usar</h2>
+
+  <div class="menu-buttons">
+    <button id="btnSensi" class="active" onclick="mostrar('sensi')">Sensi</button>
+    <button id="btnAuxilio" onclick="mostrar('auxilio')">Auxílio</button>
+  </div>
+
+  <div id="sensi" style="display: block;">
+    <select id="marca" onchange="atualizarModelos()">
+      <option value="">Selecione a marca</option>
+      <option value="Apple">Apple</option>
+      <option value="Samsung">Samsung</option>
+      <option value="Xiaomi">Xiaomi</option>
+      <option value="Motorola">Motorola</option>
+      <option value="Asus">Asus</option>
+      <option value="Realme">Realme</option>
+      <option value="Huawei">Huawei</option>
+      <option value="LG">LG</option>
+      <option value="Sony">Sony</option>
+      <option value="Infinix">Infinix</option>
+    </select>
+
+    <select id="modelo">
+      <option value="">Selecione o modelo</option>
+    </select>
+
+    <button class="action" onclick="gerarSensibilidade()">Gerar</button>
+    <div class="resultado" id="resultado"></div>
+  </div>
+
+  <div id="auxilio" class="auxilios">
+    <label><input type="checkbox" id="calibrar"> Calibrar sensibilidade</label>
+    <label><input type="checkbox" id="reduzir"> Reduzir recuo</label>
+    <label><input type="checkbox" id="precisao"> Aumentar precisão</label>
+    <label><input type="checkbox" id="inputlag"> Retirar input lag</label>
+    <button class="action" onclick="injetarAuxilio()">Injetar</button>
+
+    <div class="progress-bar" id="progress-bar">
+      <div class="progress-bar-inner" id="progress-bar-inner"></div>
+    </div>
+    <div class="injection-message" id="injection-message">Injetado com sucesso!</div>
+  </div>
+</div>
+
+<div class="creditos">
+  Feito por 
+  <a href="https://www.instagram.com/nexus.sensix/" target="_blank">
+    <i class="fab fa-instagram"></i> @nexus.sensix
+  </a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+particlesJS('particles-js', {
+  particles: {
+    number: { value: 80 },
+    color: { value: "#ffffff" },
+    shape: { type: "circle" },
+    opacity: { value: 0.5 },
+    size: { value: 3, random: true },
+    line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
+    move: { enable: true, speed: 3 }
+  },
+  interactivity: {
+    detect_on: "canvas",
+    events: {
+      onhover: { enable: true, mode: "grab" },
+      onclick: { enable: true, mode: "push" }
+    },
+    modes: {
+      grab: { distance: 200, line_linked: { opacity: 1 } },
+      push: { particles_nb: 4 }
+    }
+  },
+  retina_detect: true
+});
+
+const modelos = {
+  Apple: ["iPhone 11", "iPhone 12", "iPhone 13", "iPhone 14", "iPhone 15", "iPhone SE", "iPhone XS", "iPhone XR", "iPhone 8", "iPhone 7", "Outro"],
+  Samsung: ["Galaxy S21", "Galaxy A52", "Galaxy M31", "Outro"],
+  Xiaomi: ["POCO X3", "POCO F5", "Redmi Note 11", "Outro"],
+  Motorola: ["Moto G60", "Moto G100", "Moto Edge 20", "Outro"],
+  Asus: ["ZenFone 8", "ZenFone 7", "Outro"],
+  Realme: ["Realme GT", "Realme 8 Pro", "Outro"],
+  Huawei: ["P40 Pro", "P30 Pro", "Outro"],
+  LG: ["LG Velvet", "LG G8X", "Outro"],
+  Sony: ["Xperia 1 II", "Xperia 5 II", "Outro"],
+  Infinix: ["Infinix Zero 8", "Infinix Hot 10", "Outro"]
+};
+
+function atualizarModelos() {
+  const marcaSelect = document.getElementById('marca');
+  const modeloSelect = document.getElementById('modelo');
+  const marca = marcaSelect.value;
+
+  modeloSelect.innerHTML = '<option value="">Selecione o modelo</option>';
+  if (marca) {
+    const modelosMarca = modelos[marca];
+    modelosMarca.forEach(modelo => {
+      const option = document.createElement('option');
+      option.value = modelo;
+      option.textContent = modelo;
+      modeloSelect.appendChild(option);
+    });
+  }
+}
+
+function gerarSensibilidade() {
+  const modeloSelect = document.getElementById('modelo');
+  const resultado = document.getElementById('resultado');
+  const modelo = modeloSelect.value;
+
+  if (modelo) {
+    const geral = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
+    const pontoVermelho = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
+    const mira2x = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
+    const mira4x = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
+    const tamanhoBotao = Math.floor(Math.random() * (63 - 45 + 1)) + 45;
+
+    resultado.innerHTML = `
+      <strong>Modelo:</strong> ${modelo}<br>
+      <strong>Geral:</strong> ${geral}<br>
+      <strong>Ponto Vermelho:</strong> ${pontoVermelho}<br>
+      <strong>Mira 2x:</strong> ${mira2x}<br>
+      <strong>Mira 4x:</strong> ${mira4x}<br>
+      <strong>Tamanho do Botão:</strong> ${tamanhoBotao}
+    `;
+    resultado.style.display = 'block';
+  } else {
+    resultado.style.display = 'none';
+  }
+}
+
+function mostrar(menu) {
+  document.getElementById('sensi').style.display = (menu === 'sensi') ? 'block' : 'none';
+  document.getElementById('auxilio').style.display = (menu === 'auxilio') ? 'block' : 'none';
+  document.getElementById('btnSensi').classList.toggle('active', menu === 'sensi');
+  document.getElementById('btnAuxilio').classList.toggle('active', menu === 'auxilio');
+}
+
+function injetarAuxilio() {
+  const progressBar = document.getElementById('progress-bar');
+  const progressBarInner = document.getElementById('progress-bar-inner');
+  const injectionMessage = document.getElementById('injection-message');
+
+  progressBar.style.display = 'block';
+  injectionMessage.style.display = 'none';
+
+  let width = 0;
+  const interval = setInterval(function() {
+    if (width >= 100) {
+      clearInterval(interval);
+      injectionMessage.style.display = 'block';
+    } else {
+      width++;
+      progressBarInner.style.width = width + '%';
+    }
+  }, 30);
+}
+</script>
+
+</body>
+</html>
