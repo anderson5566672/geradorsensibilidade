@@ -2,353 +2,913 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gerador de Sensibilidade</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#05060a">
+<title>Gerador de Sensibilidade | ANDEZIN SENSI</title>
+<meta name="description" content="Gere a sensibilidade ideal para o seu celular. Mais de 1.300 aparelhos de 30 marcas, ajuste por estilo de jogo e otimização de desempenho.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    overflow: hidden;
-    background: #000;
-    font-family: 'Poppins', sans-serif;
-  }
+:root{
+  --bg:#05060a; --ink:#eef1f8; --muted:#8b93a7; --muted-2:#5f6779;
+  --card:rgba(255,255,255,.045); --card-solid:#0c0f18;
+  --stroke:rgba(255,255,255,.10); --stroke-2:rgba(255,255,255,.18);
+  --p1:#7c5cff; --p2:#12d8ff; --ok:#25e07a; --warn:#ffb020;
+  --cta1:#ff9f0a; --cta2:#ff2d6f;
+  --r:18px; --r-sm:12px; --shadow:0 24px 60px -20px rgba(0,0,0,.85);
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --display:'Sora','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+*::selection{background:rgba(124,92,255,.35);color:#fff}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100dvh;background:var(--bg);color:var(--ink);
+  font-family:var(--font);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  padding:max(18px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+}
 
-  #particles-js {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    z-index: 0;
-  }
+/* FUNDO */
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;background:var(--bg)}
+#fx{position:absolute;inset:0;width:100%;height:100%;display:block}
+.aurora{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;will-change:transform;pointer-events:none}
+.a1{width:60vmax;height:60vmax;top:-24vmax;left:-18vmax;background:radial-gradient(circle,rgba(124,92,255,.55),transparent 66%);animation:drift1 26s ease-in-out infinite}
+.a2{width:52vmax;height:52vmax;bottom:-22vmax;right:-16vmax;background:radial-gradient(circle,rgba(18,216,255,.40),transparent 66%);animation:drift2 32s ease-in-out infinite}
+.a3{width:40vmax;height:40vmax;top:40%;left:50%;background:radial-gradient(circle,rgba(255,45,111,.22),transparent 68%);animation:drift3 38s ease-in-out infinite}
+@keyframes drift1{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(6vmax,5vmax,0)}}
+@keyframes drift2{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(-7vmax,-4vmax,0)}}
+@keyframes drift3{0%,100%{transform:translate3d(-50%,0,0)}50%{transform:translate3d(-40%,-6vmax,0)}}
+.grid-lines{position:absolute;inset:0;opacity:.22;
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:46px 46px;
+  -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 35%,#000,transparent 75%);
+  mask-image:radial-gradient(ellipse 80% 60% at 50% 35%,#000,transparent 75%)}
+.vignette{position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 50% 0%,transparent 40%,rgba(0,0,0,.75) 100%)}
 
-  .container {
-    position: relative;
-    z-index: 1;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 30px;
-    border-radius: 15px;
-    border: 1px solid #ffffff50;
-    box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.2);
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-    margin: auto;
-    top: 50%;
-    transform: translateY(-50%);
-    color: white;
-  }
+/* LAYOUT */
+.wrap{width:100%;max-width:480px;margin:0 auto;position:relative;z-index:1}
+.hero{text-align:center;margin-bottom:20px;animation:rise .7s cubic-bezier(.16,1,.3,1) both}
+.badge{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;
+  background:rgba(255,255,255,.05);border:1px solid var(--stroke);
+  font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#c9cfdd}
+.badge .live{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(37,224,122,.7);animation:pulse 2.2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(37,224,122,0)}100%{box-shadow:0 0 0 0 rgba(37,224,122,0)}}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(28px,8.4vw,40px);line-height:1.08;letter-spacing:-.02em;margin:16px 0 8px}
+.grad{background:linear-gradient(100deg,var(--p1) 0%,var(--p2) 55%,#fff 120%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+  padding-bottom:.08em;display:inline-block}
+.sub{color:var(--muted);font-size:14px;margin:0 auto;max-width:340px}
+.stats{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+.stat{flex:1 1 0;min-width:96px;padding:10px 8px;border-radius:var(--r-sm);background:rgba(255,255,255,.04);border:1px solid var(--stroke)}
+.stat b{display:block;font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.01em}
+.stat span{font-size:10.5px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
 
-  .menu-buttons {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-    gap: 10px;
-  }
+.card{position:relative;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025));
+  border:1px solid var(--stroke);border-radius:26px;padding:18px;box-shadow:var(--shadow);
+  animation:rise .8s .1s cubic-bezier(.16,1,.3,1) both}
+.card::before{content:"";position:absolute;inset:0;border-radius:26px;padding:1px;
+  background:linear-gradient(160deg,rgba(255,255,255,.28),transparent 35%,transparent 65%,rgba(124,92,255,.35));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+@media (min-width:768px){.card{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}}
 
-  .menu-buttons button {
-    background-color: transparent;
-    border: 2px solid white;
-    color: white;
-    font-size: 16px;
-    padding: 10px 0;
-    border-radius: 8px;
-    cursor: pointer;
-    flex: 1;
-    transition: all 0.3s;
-  }
+/* TABS */
+.tabs{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:14px;background:rgba(0,0,0,.4);border:1px solid var(--stroke);margin-bottom:18px}
+.tabs .pill{position:absolute;top:4px;left:4px;width:calc(50% - 6px);height:calc(100% - 8px);border-radius:11px;background:linear-gradient(120deg,var(--p1),var(--p2));transition:transform .35s cubic-bezier(.16,1,.3,1);box-shadow:0 6px 18px -6px rgba(124,92,255,.8)}
+.tabs[data-active="auxilio"] .pill{transform:translateX(calc(100% + 4px))}
+.tab{position:relative;z-index:1;appearance:none;border:0;background:transparent;color:var(--muted);
+  font-family:var(--font);font-size:13.5px;font-weight:700;padding:11px 6px;border-radius:11px;cursor:pointer;
+  transition:color .25s;display:flex;align-items:center;justify-content:center;gap:7px}
+.tab[aria-selected="true"]{color:#fff}
+.tab svg{width:15px;height:15px}
 
-  .menu-buttons button:hover,
-  .menu-buttons button.active {
-    background-color: white;
-    color: black;
-  }
+/* CAMPOS */
+.label{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.label .num{width:19px;height:19px;border-radius:6px;display:grid;place-items:center;background:rgba(124,92,255,.18);border:1px solid rgba(124,92,255,.4);color:#c3b4ff;font-size:10px;font-weight:800;letter-spacing:0}
+.field{margin-bottom:18px}
+.brands{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.brands::-webkit-scrollbar{display:none}
+.brand{flex:0 0 auto;padding:9px 14px;border-radius:11px;cursor:pointer;background:rgba(255,255,255,.045);
+  border:1px solid var(--stroke);color:#c3cad9;font-size:13px;font-weight:600;white-space:nowrap;
+  transition:transform .2s,border-color .2s,color .2s,background .2s}
+.brand:hover{border-color:var(--stroke-2);color:#fff}
+.brand:active{transform:scale(.96)}
+.brand.on{background:linear-gradient(120deg,rgba(124,92,255,.25),rgba(18,216,255,.18));border-color:rgba(124,92,255,.65);color:#fff;box-shadow:0 0 0 1px rgba(124,92,255,.25),0 8px 20px -10px rgba(124,92,255,.9)}
 
-  select, input[type="text"], button.action {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    border-radius: 8px;
-    background-color: #111;
-    color: white;
-    border: 1px solid #ffffff50;
-    font-size: 14px;
-  }
+.combo{position:relative}
+.combo-input{width:100%;padding:14px 44px 14px 42px;border-radius:14px;background:rgba(0,0,0,.42);
+  border:1px solid var(--stroke);color:var(--ink);font-family:var(--font);font-size:15px;font-weight:500;
+  transition:border-color .2s,box-shadow .2s}
+.combo-input::placeholder{color:var(--muted-2)}
+.combo-input:focus{outline:none;border-color:rgba(124,92,255,.75);box-shadow:0 0 0 4px rgba(124,92,255,.14)}
+.combo .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--muted-2);pointer-events:none}
+.combo .clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:9px;border:0;background:rgba(255,255,255,.07);color:var(--muted);display:none;place-items:center;cursor:pointer}
+.combo.filled .clear{display:grid}
+.combo .clear:hover{background:rgba(255,255,255,.14);color:#fff}
+.list{position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:30;max-height:250px;overflow-y:auto;
+  overscroll-behavior:contain;background:var(--card-solid);border:1px solid var(--stroke-2);border-radius:14px;
+  box-shadow:0 30px 60px -18px rgba(0,0,0,.95);padding:6px;display:none}
+.list.open{display:block;animation:pop .18s ease-out}
+.list::-webkit-scrollbar{width:8px}
+.list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+.opt{padding:11px 12px;border-radius:10px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.opt:hover,.opt.hl{background:rgba(124,92,255,.18)}
+.opt small{color:var(--muted-2);font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;flex:0 0 auto}
+.opt mark{background:transparent;color:#12d8ff;font-weight:700}
+.empty{padding:16px 12px;text-align:center;color:var(--muted-2);font-size:13px}
+.more{padding:8px 12px;text-align:center;color:var(--muted-2);font-size:11.5px;border-top:1px solid var(--stroke)}
 
-  button.action {
-    background-color: transparent;
-    border: 2px solid white;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s, color 0.3s;
-  }
+.styles{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.style{text-align:center;padding:11px 4px;border-radius:12px;cursor:pointer;background:rgba(255,255,255,.04);border:1px solid var(--stroke);transition:all .2s}
+.style:active{transform:scale(.97)}
+.style svg{width:19px;height:19px;color:var(--muted);margin-bottom:4px;transition:color .2s}
+.style b{display:block;font-size:12.5px;font-weight:700;color:#c3cad9}
+.style small{font-size:10px;color:var(--muted-2)}
+.style.on{background:linear-gradient(160deg,rgba(124,92,255,.22),rgba(18,216,255,.12));border-color:rgba(124,92,255,.6)}
+.style.on svg{color:#12d8ff}
+.style.on b{color:#fff}
 
-  button.action:hover {
-    background-color: white;
-    color: black;
-  }
+.btn{width:100%;padding:15px;border:0;border-radius:14px;cursor:pointer;font-family:var(--display);
+  font-size:14.5px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:9px;
+  transition:transform .15s,box-shadow .25s,filter .2s}
+.btn:active{transform:scale(.98)}
+.btn svg{width:17px;height:17px}
+.btn-main{background:linear-gradient(120deg,var(--p1),var(--p2));color:#fff;box-shadow:0 14px 30px -12px rgba(124,92,255,.95)}
+.btn-main:hover{filter:brightness(1.08)}
+.btn-main:disabled{opacity:.55;cursor:not-allowed;filter:grayscale(.4)}
+.btn-ghost{background:rgba(255,255,255,.06);border:1px solid var(--stroke);color:#c3cad9;font-size:13px;padding:12px}
+.btn-ghost:hover{background:rgba(255,255,255,.12);color:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 
-  .resultado, .auxilios {
-    background-color: #111;
-    margin-top: 20px;
-    padding: 15px;
-    border: 1px solid #ffffff50;
-    border-radius: 8px;
-    font-size: 14px;
-    display: none;
-    text-align: left;
-  }
+.result{display:none;margin-top:18px}
+.result.show{display:block;animation:rise .55s cubic-bezier(.16,1,.3,1) both}
+.res-head{display:flex;align-items:center;gap:11px;padding:13px;border-radius:14px;
+  background:linear-gradient(120deg,rgba(124,92,255,.18),rgba(18,216,255,.08));border:1px solid rgba(124,92,255,.35);margin-bottom:14px}
+.res-head .ph{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(0,0,0,.35);flex:0 0 auto}
+.res-head .ph svg{width:17px;height:17px;color:#12d8ff}
+.res-head b{display:block;font-size:14.5px;font-weight:700;line-height:1.25}
+.res-head span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.bars{display:grid;gap:11px;margin-bottom:14px}
+.bar-row{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+.bar-row .k{font-size:12.5px;color:#b7bfd0;font-weight:500}
+.bar-row .v{font-family:var(--display);font-size:16px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+.track{grid-column:1/-1;height:6px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+.fill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--p1),var(--p2));transition:width 1s cubic-bezier(.16,1,.3,1)}
+.chips{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
+.chip{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--stroke)}
+.chip span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted-2);font-weight:700;margin-bottom:2px}
+.chip b{font-size:13.5px;font-weight:700;color:#fff}
+.tips{border-radius:12px;background:rgba(255,176,32,.07);border:1px solid rgba(255,176,32,.22);padding:12px;margin-bottom:12px}
+.tips p{margin:0 0 7px;font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--warn)}
+.tips ul{margin:0;padding:0}
+.tips li{font-size:12.5px;color:#c9cfdd;margin-bottom:4px;list-style:none;padding-left:16px;position:relative}
+.tips li::before{content:"";position:absolute;left:2px;top:7px;width:5px;height:5px;border-radius:50%;background:var(--warn)}
 
-  .auxilios label {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    gap: 10px;
-    font-size: 14px;
-  }
+.opts{display:grid;gap:8px;margin-bottom:16px}
+.opt-card{display:flex;align-items:center;gap:12px;padding:13px;border-radius:14px;cursor:pointer;
+  background:rgba(255,255,255,.035);border:1px solid var(--stroke);transition:all .2s}
+.opt-card:active{transform:scale(.99)}
+.opt-card .oi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.05);flex:0 0 auto;transition:all .25s}
+.opt-card .oi svg{width:16px;height:16px;color:var(--muted)}
+.opt-card .ot{flex:1;min-width:0}
+.opt-card .ot b{display:block;font-size:13.5px;font-weight:600}
+.opt-card .ot small{font-size:11.5px;color:var(--muted-2)}
+.switch{width:42px;height:24px;border-radius:99px;background:rgba(255,255,255,.1);border:1px solid var(--stroke);position:relative;flex:0 0 auto;transition:background .25s,border-color .25s}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#8b93a7;transition:transform .28s cubic-bezier(.16,1,.3,1),background .25s}
+.opt-card input{position:absolute;opacity:0;pointer-events:none}
+.opt-card.on{background:linear-gradient(120deg,rgba(124,92,255,.16),rgba(18,216,255,.07));border-color:rgba(124,92,255,.5)}
+.opt-card.on .oi{background:rgba(124,92,255,.25)}
+.opt-card.on .oi svg{color:#12d8ff}
+.opt-card.on .switch{background:linear-gradient(120deg,var(--p1),var(--p2));border-color:transparent}
+.opt-card.on .switch::after{transform:translateX(18px);background:#fff}
 
-  .auxilios input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    appearance: none;
-    background-color: black;
-    border: 2px solid white;
-    border-radius: 4px;
-    cursor: pointer;
-  }
+.console{display:none;margin-top:16px}
+.console.show{display:block}
+.pbar{height:8px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden;margin-bottom:11px}
+.pfill{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--p1),var(--p2));transition:width .3s linear;position:relative;overflow:hidden}
+.pfill::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:shine 1.1s linear infinite}
+.log{background:rgba(0,0,0,.5);border:1px solid var(--stroke);border-radius:12px;padding:11px;
+  font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:11.5px;min-height:96px;max-height:130px;overflow-y:auto;color:#8b93a7}
+.log div{margin-bottom:4px;animation:pop .25s ease-out}
+.log .ok{color:var(--ok)}
+.log .hl{color:#12d8ff}
+.done{display:none;text-align:center;padding:16px;border-radius:14px;margin-top:12px;background:rgba(37,224,122,.09);border:1px solid rgba(37,224,122,.3)}
+.done.show{display:block;animation:rise .5s cubic-bezier(.16,1,.3,1) both}
+.done .ck{width:42px;height:42px;border-radius:50%;background:rgba(37,224,122,.16);display:grid;place-items:center;margin:0 auto 9px}
+.done .ck svg{width:21px;height:21px;color:var(--ok)}
+.done b{display:block;font-family:var(--display);font-size:15px;font-weight:700;color:var(--ok)}
+.done small{font-size:12px;color:var(--muted)}
 
-  .auxilios input[type="checkbox"]:checked {
-    background-color: white;
-  }
+.cta{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;margin-top:16px;
+  padding:17px 18px;border-radius:18px;position:relative;overflow:hidden;
+  background:linear-gradient(100deg,var(--cta1),var(--cta2));color:#fff;font-family:var(--display);
+  font-size:14.5px;font-weight:800;letter-spacing:.02em;text-align:center;line-height:1.25;
+  box-shadow:0 18px 40px -14px rgba(255,45,111,.85);
+  animation:rise .8s .2s cubic-bezier(.16,1,.3,1) both,breathe 3.4s ease-in-out infinite 1s;
+  transition:transform .15s,filter .2s}
+.cta:active{transform:scale(.985)}
+.cta:hover{filter:brightness(1.07)}
+.cta::after{content:"";position:absolute;top:0;bottom:0;width:44%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.4),transparent);animation:sweep 3.2s ease-in-out infinite 1.4s}
+.cta svg{width:19px;height:19px;flex:0 0 auto}
+.cta .txt{flex:1}
+.cta small{display:block;font-family:var(--font);font-size:10.5px;font-weight:600;opacity:.9;letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+@keyframes sweep{0%{left:-60%}55%,100%{left:130%}}
+@keyframes breathe{0%,100%{box-shadow:0 18px 40px -14px rgba(255,45,111,.85)}50%{box-shadow:0 20px 52px -12px rgba(255,45,111,1)}}
+.cta-mini{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;margin-top:12px;padding:13px;border-radius:13px;background:linear-gradient(100deg,var(--cta1),var(--cta2));color:#fff;font-family:var(--display);font-size:12.5px;font-weight:800}
 
-  h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
-    color: white;
-  }
+.foot{text-align:center;margin-top:22px;font-size:12.5px;color:var(--muted-2);animation:rise .9s .3s cubic-bezier(.16,1,.3,1) both}
+.foot a{display:inline-flex;align-items:center;gap:6px;color:#c3cad9;text-decoration:none;font-weight:600;padding:7px 12px;border-radius:99px;background:rgba(255,255,255,.045);border:1px solid var(--stroke);margin-top:8px;transition:all .2s}
+.foot a:hover{color:#fff;border-color:var(--stroke-2)}
+.foot a svg{width:14px;height:14px}
+.disclaimer{margin-top:12px;font-size:10.5px;color:#4a5163;max-width:330px;margin-inline:auto;line-height:1.5}
 
-  h2 {
-    font-size: 16px;
-    margin-bottom: 20px;
-    color: gray;
-  }
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,140%);z-index:99;pointer-events:none;
+  background:rgba(12,15,24,.97);border:1px solid var(--stroke-2);border-radius:13px;padding:12px 18px;
+  font-size:13px;font-weight:600;box-shadow:var(--shadow);display:flex;align-items:center;gap:9px;max-width:88vw;
+  transition:transform .4s cubic-bezier(.16,1,.3,1)}
+#toast.show{transform:translate(-50%,0)}
+#toast svg{width:15px;height:15px;color:var(--ok);flex:0 0 auto}
 
-  .progress-bar {
-    width: 100%;
-    background-color: #333;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-top: 10px;
-    display: none;
-  }
-
-  .progress-bar-inner {
-    height: 10px;
-    width: 0;
-    background-color: #fff;
-    transition: width 3s linear;
-  }
-
-  .injection-message {
-    margin-top: 15px;
-    color: #ffffff;
-    font-weight: bold;
-    display: none;
-    text-align: center;
-  }
-
-  .creditos {
-    position: absolute;
-    bottom: 10px;
-    width: 100%;
-    text-align: center;
-    font-size: 14px;
-    color: gray;
-    z-index: 1;
-  }
-
-  .creditos a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-  }
-
-  .creditos a:hover {
-    text-decoration: underline;
-  }
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+@keyframes shine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .8s linear infinite}
+:focus-visible{outline:2px solid var(--p2);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+@media (max-width:380px){.card{padding:15px;border-radius:22px}.stat b{font-size:15px}.chips{grid-template-columns:1fr}}
 </style>
 </head>
-
 <body>
 
-<div id="particles-js"></div>
+<div class="bg" aria-hidden="true">
+  <canvas id="fx"></canvas>
+  <div class="aurora a1"></div>
+  <div class="aurora a2"></div>
+  <div class="aurora a3"></div>
+  <div class="grid-lines"></div>
+  <div class="vignette"></div>
+</div>
 
-<div class="container">
-  <h1>Sensibilidade / Auxílio</h1>
-  <h2>Configure a sensibilidade para usar</h2>
-
-  <div class="menu-buttons">
-    <button id="btnSensi" class="active" onclick="mostrar('sensi')">Sensi</button>
-    <button id="btnAuxilio" onclick="mostrar('auxilio')">Auxílio</button>
-  </div>
-
-  <div id="sensi" style="display: block;">
-    <select id="marca" onchange="atualizarModelos()">
-      <option value="">Selecione a marca</option>
-      <option value="Apple">Apple</option>
-      <option value="Samsung">Samsung</option>
-      <option value="Xiaomi">Xiaomi</option>
-      <option value="Motorola">Motorola</option>
-      <option value="Asus">Asus</option>
-      <option value="Realme">Realme</option>
-      <option value="Huawei">Huawei</option>
-      <option value="LG">LG</option>
-      <option value="Sony">Sony</option>
-      <option value="Infinix">Infinix</option>
-    </select>
-
-    <select id="modelo">
-      <option value="">Selecione o modelo</option>
-    </select>
-
-    <button class="action" onclick="gerarSensibilidade()">Gerar</button>
-    <div class="resultado" id="resultado"></div>
-  </div>
-
-  <div id="auxilio" class="auxilios">
-    <label><input type="checkbox" id="calibrar"> Calibrar sensibilidade</label>
-    <label><input type="checkbox" id="reduzir"> Reduzir recuo</label>
-    <label><input type="checkbox" id="precisao"> Aumentar precisão</label>
-    <label><input type="checkbox" id="inputlag"> Retirar input lag</label>
-    <button class="action" onclick="injetarAuxilio()">Injetar</button>
-
-    <div class="progress-bar" id="progress-bar">
-      <div class="progress-bar-inner" id="progress-bar-inner"></div>
+<main class="wrap">
+  <header class="hero">
+    <div class="badge"><span class="live"></span> Gerador Oficial · 2026</div>
+    <h1>Sensibilidade<br><span class="grad">Perfeita</span></h1>
+    <p class="sub">Selecione seu aparelho e receba a configuração ideal em segundos.</p>
+    <div class="stats">
+      <div class="stat"><b id="stModels">—</b><span>Aparelhos</span></div>
+      <div class="stat"><b id="stBrands">—</b><span>Marcas</span></div>
+      <div class="stat"><b>100%</b><span>Grátis</span></div>
     </div>
-    <div class="injection-message" id="injection-message">Injetado com sucesso!</div>
-  </div>
-</div>
+  </header>
 
-<div class="creditos">
-  Desenvolvido por 
-  <a href="https://www.instagram.com/nexus.sensix/" target="_blank">
-    <i class="fab fa-instagram"></i> @nexus.sensix
+  <section class="card">
+    <div class="tabs" data-active="sensi" role="tablist">
+      <div class="pill"></div>
+      <button class="tab" id="tabSensi" role="tab" aria-selected="true" aria-controls="panelSensi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M23 12h-4M5 12H1"/></svg>
+        Sensibilidade
+      </button>
+      <button class="tab" id="tabAux" role="tab" aria-selected="false" aria-controls="panelAux">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+        Otimizar
+      </button>
+    </div>
+
+    <div id="panelSensi" role="tabpanel">
+      <div class="field">
+        <p class="label"><span class="num">1</span> Escolha a marca</p>
+        <div class="brands" id="brands"></div>
+      </div>
+
+      <div class="field">
+        <p class="label"><span class="num">2</span> Escolha o modelo</p>
+        <div class="combo" id="combo">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input class="combo-input" id="modelInput" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="Buscar seu celular..." role="combobox" aria-expanded="false" aria-controls="modelList" aria-label="Buscar modelo do celular">
+          <button class="clear" id="clearBtn" type="button" aria-label="Limpar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" width="14" height="14"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+          <div class="list" id="modelList" role="listbox"></div>
+        </div>
+        <button class="btn btn-ghost" id="detectBtn" type="button" style="margin-top:9px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M11 18h2"/></svg>
+          Detectar meu aparelho
+        </button>
+      </div>
+
+      <div class="field">
+        <p class="label"><span class="num">3</span> Estilo de jogo</p>
+        <div class="styles" id="styles">
+          <div class="style" data-style="agressivo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg>
+            <b>Rush</b><small>Curta</small>
+          </div>
+          <div class="style on" data-style="equilibrado">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8h14M7 8l-3 6a3.5 3.5 0 0 0 6 0L7 8zM17 8l-3 6a3.5 3.5 0 0 0 6 0l-3-6z"/></svg>
+            <b>Equilíbrio</b><small>Geral</small>
+          </div>
+          <div class="style" data-style="precisao">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg>
+            <b>Sniper</b><small>Longa</small>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-main" id="genBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.4 5.6L20 11l-5.6 2.4L12 19l-2.4-5.6L4 11l5.6-2.4L12 3z"/></svg>
+        GERAR SENSIBILIDADE
+      </button>
+
+      <div class="result" id="result">
+        <div class="res-head">
+          <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2.5"/><path d="M11 18h2"/></svg></div>
+          <div style="min-width:0">
+            <b id="resModel">—</b>
+            <span id="resTag">—</span>
+          </div>
+        </div>
+        <div class="bars" id="bars"></div>
+        <div class="chips" id="extras"></div>
+        <div class="tips">
+          <p>Dicas para travar menos</p>
+          <ul>
+            <li>Feche os apps em segundo plano antes de jogar.</li>
+            <li>Deixe o celular em modo desempenho e sem carregar.</li>
+            <li>Teste no treinamento por 10 minutos antes do ranqueado.</li>
+          </ul>
+        </div>
+        <div class="row">
+          <button class="btn btn-ghost" id="copyBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            Copiar
+          </button>
+          <button class="btn btn-ghost" id="againBtn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+            Nova variação
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="panelAux" role="tabpanel" hidden>
+      <div class="opts" id="opts">
+        <label class="opt-card" data-k="calibrar">
+          <input type="checkbox">
+          <span class="oi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></span>
+          <span class="ot"><b>Calibrar sensibilidade</b><small>Ajuste fino do toque na tela</small></span>
+          <span class="switch"></span>
+        </label>
+        <label class="opt-card" data-k="recuo">
+          <input type="checkbox">
+          <span class="oi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V6M6 12l6-6 6 6"/><path d="M4 22h16"/></svg></span>
+          <span class="ot"><b>Reduzir recuo</b><small>Estabiliza a mira no tiro contínuo</small></span>
+          <span class="switch"></span>
+        </label>
+        <label class="opt-card" data-k="precisao">
+          <input type="checkbox">
+          <span class="oi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M22 12h-3M5 12H2"/></svg></span>
+          <span class="ot"><b>Aumentar precisão</b><small>Melhora o rastreio do alvo</small></span>
+          <span class="switch"></span>
+        </label>
+        <label class="opt-card" data-k="inputlag">
+          <input type="checkbox">
+          <span class="oi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"/></svg></span>
+          <span class="ot"><b>Retirar input lag</b><small>Resposta mais rápida ao toque</small></span>
+          <span class="switch"></span>
+        </label>
+        <label class="opt-card" data-k="fps">
+          <input type="checkbox">
+          <span class="oi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-6 4 4 5-7 4 5"/><path d="M3 21h18"/></svg></span>
+          <span class="ot"><b>Estabilizar FPS</b><small>Menos queda de quadros na partida</small></span>
+          <span class="switch"></span>
+        </label>
+      </div>
+
+      <button class="btn btn-main" id="injBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>
+        APLICAR OTIMIZAÇÃO
+      </button>
+
+      <div class="console" id="console">
+        <div class="pbar"><div class="pfill" id="pfill"></div></div>
+        <div class="log" id="log"></div>
+        <div class="done" id="done">
+          <div class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+          <b>Otimização aplicada!</b>
+          <small>Reinicie o jogo para sentir a diferença.</small>
+          <a class="cta-mini" href="https://andezinsensi.shop/" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+            VER PRODUTOS PREMIUM
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <a class="cta" href="https://andezinsensi.shop/" target="_blank" rel="noopener noreferrer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+    <span class="txt">COMPRE AQUI OS MELHORES PRODUTOS<small>andezinsensi.shop</small></span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
   </a>
+
+  
+      
+    </a>
+    <p class="disclaimer">Configurações sugeridas com base no seu aparelho e estilo de jogo. Não somos afiliados a nenhuma desenvolvedora de jogos.</p>
+  </footer>
+</main>
+
+<div id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  <span id="toastMsg"></span>
 </div>
 
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 <script>
-particlesJS('particles-js', {
-  particles: {
-    number: { value: 80 },
-    color: { value: "#ffffff" },
-    shape: { type: "circle" },
-    opacity: { value: 0.5 },
-    size: { value: 3, random: true },
-    line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 },
-    move: { enable: true, speed: 3 }
-  },
-  interactivity: {
-    detect_on: "canvas",
-    events: {
-      onhover: { enable: true, mode: "grab" },
-      onclick: { enable: true, mode: "push" }
-    },
-    modes: {
-      grab: { distance: 200, line_linked: { opacity: 1 } },
-      push: { particles_nb: 4 }
-    }
-  },
-  retina_detect: true
-});
-
-const modelos = {
-  Apple: ["iPhone 11", "iPhone 12", "iPhone 13", "iPhone 14", "iPhone 15", "iPhone SE", "iPhone XS", "iPhone XR", "iPhone 8", "iPhone 7", "Outro"],
-  Samsung: ["Galaxy S25 Ultra", "Galaxy S25+", "Galaxy S25", "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24", "Galaxy S23 Ultra", "Galaxy S23+", "Galaxy S23", "Galaxy S22 Ultra", "Galaxy S22+", "Galaxy S22", "Galaxy S21 Ultra", "Galaxy S21+", "Galaxy S21", "Galaxy S20 Ultra", "Galaxy S20+", "Galaxy S20", "Galaxy S10+", "Galaxy S10", "Galaxy S10e", "Galaxy S9+", "Galaxy S9", "Galaxy S8+", "Galaxy S8", "Galaxy Note 20 Ultra", "Galaxy Note 20", "Galaxy Note 10+", "Galaxy Note 10", "Galaxy Note 9", "Galaxy Note 8", "Galaxy A74", "Galaxy A73", "Galaxy A72", "Galaxy A71", "Galaxy A70", "Galaxy A56", "Galaxy A55", "Galaxy A54", "Galaxy A53", "Galaxy A52", "Galaxy A51", "Galaxy A50", "Galaxy A36", "Galaxy A35", "Galaxy A34", "Galaxy A33", "Galaxy A32", "Galaxy A31", "Galaxy A30", "Galaxy A26", "Galaxy A25", "Galaxy A24", "Galaxy A23", "Galaxy A22", "Galaxy A21s", "Galaxy A21", "Galaxy A20s", "Galaxy A20", "Galaxy A14", "Galaxy A13", "Galaxy A12", "Galaxy A11", "Galaxy A10s", "Galaxy A10", "Galaxy M62", "Galaxy M54", "Galaxy M53", "Galaxy M52", "Galaxy M51", "Galaxy M42", "Galaxy M40", "Galaxy M36", "Galaxy M35", "Galaxy M34", "Galaxy M33", "Galaxy M32", "Galaxy M31s", "Galaxy M31", "Galaxy M30s", "Galaxy M30", "Galaxy M22", "Galaxy M21s", "Galaxy M21", "Galaxy M20", "Galaxy M13", "Galaxy M12", "Galaxy M11", "Galaxy Z Fold 6", "Galaxy Z Fold 5", "Galaxy Z Fold 4", "Galaxy Z Fold 3", "Galaxy Z Fold 2", "Galaxy Z Fold", "Galaxy Z Flip 6", "Galaxy Z Flip 5", "Galaxy Z Flip 4", "Galaxy Z Flip 3", "Galaxy Z Flip", "Galaxy S24 FE", "Galaxy S23 FE", "Galaxy S21 FE", "Galaxy S20 FE", "Galaxy A9 (2018)", "Galaxy A8+", "Galaxy A8", "Galaxy A7 (2018)", "Galaxy A6+", "Galaxy A6", "Galaxy J8", "Galaxy J7 Prime", "Galaxy J7", "Galaxy J6", "Galaxy J5 Prime", "Galaxy J5", "Galaxy J4", "Galaxy J3", "Galaxy C9 Pro", "Galaxy C7 Pro", "Galaxy C5 Pro", "Outro"],
-  Xiaomi: ["Xiaomi 15 Ultra", "Xiaomi 15 Pro", "Xiaomi 15", "Xiaomi 14 Ultra", "Xiaomi 14 Pro", "Xiaomi 14", "Xiaomi 14T Pro", "Xiaomi 14T", "Xiaomi 13 Ultra", "Xiaomi 13 Pro", "Xiaomi 13", "Xiaomi 13T Pro", "Xiaomi 13T", "Xiaomi 12S Ultra", "Xiaomi 12S Pro", "Xiaomi 12S", "Xiaomi 12 Pro", "Xiaomi 12", "Xiaomi 12X", "Xiaomi 11 Ultra", "Xiaomi 11T Pro", "Xiaomi 11T", "Xiaomi 11", "Xiaomi 10T Pro", "Xiaomi 10T", "Xiaomi 10", "Xiaomi 9T Pro", "Xiaomi 9T", "Xiaomi 9", "Xiaomi 8", "Redmi Note 14 Pro+", "Redmi Note 14 Pro", "Redmi Note 14", "Redmi Note 13 Pro+", "Redmi Note 13 Pro", "Redmi Note 13", "Redmi Note 12 Pro+", "Redmi Note 12 Pro", "Redmi Note 12", "Redmi Note 11 Pro+", "Redmi Note 11 Pro", "Redmi Note 11", "Redmi Note 10 Pro", "Redmi Note 10", "Redmi Note 9 Pro", "Redmi Note 9", "Redmi Note 8 Pro", "Redmi Note 8", "Redmi Note 7 Pro", "Redmi Note 7", "Redmi K80 Pro", "Redmi K80", "Redmi K70 Pro", "Redmi K70", "Redmi K60 Pro", "Redmi K60", "Redmi K50 Pro", "Redmi K50", "Redmi K40 Pro", "Redmi K40", "Redmi 14C", "Redmi 13C", "Redmi 12C", "Redmi 11C", "Redmi 10C", "Redmi 9C", "Redmi 8C", "Redmi 7C", "Redmi A5", "Redmi A4", "Redmi A3", "Redmi A2", "Redmi A1", "Poco F7 Pro", "Poco F7", "Poco F6 Pro", "Poco F6", "Poco F5 Pro", "Poco F5", "Poco F4 GT", "Poco F4", "Poco F3 GT", "Poco F3", "Poco X7 Pro", "Poco X7", "Poco X6 Pro", "Poco X6", "Poco X5 Pro", "Poco X5", "Poco X4 Pro", "Poco X4", "Poco X3 Pro", "Poco X3", "Poco M7 Pro", "Poco M6 Pro", "Poco M6", "Poco M5s", "Poco M5", "Poco M4 Pro", "Poco M4", "Poco M3 Pro", "Poco M3", "Poco C75", "Poco C65", "Poco C55", "Poco C50", "Mi Mix Fold 4", "Mi Mix Fold 3", "Mi Mix Fold 2", "Mi Mix Fold", "Mi Mix 4", "Mi Mix 3", "Mi Mix 2S", "Mi Mix 2", "Xiaomi Civi 4 Pro", "Xiaomi Civi 3", "Xiaomi Civi 2", "Xiaomi Civi", "Black Shark 6 Pro", "Black Shark 6", "Black Shark 5 Pro", "Black Shark 5", "Black Shark 4 Pro", "Outro"],
-  Motorola: ["Motorola Edge 40 Pro", "Motorola Edge 40", "Motorola Edge 30 Ultra", "Motorola Edge 30 Pro", "Motorola Edge 30", "Motorola Edge 20 Pro", "Motorola Edge 20", "Motorola Edge 20 Lite", "Motorola Edge+ (2023)", "Motorola Edge+ (2022)", "Motorola Edge 10", "Motorola One Edge", "Motorola One Vision", "Motorola One Fusion+", "Motorola One Fusion", "Motorola One Macro", "Motorola One Power", "Motorola One Zoom", "Motorola One", "Motorola Moto G100", "Motorola Moto G200", "Motorola Moto G100 5G", "Motorola Moto G60", "Motorola Moto G60s", "Motorola Moto G40 Fusion", "Motorola Moto G9 Power", "Motorola Moto G9 Plus", "Motorola Moto G9", "Motorola Moto G8 Plus", "Motorola Moto G8", "Motorola Moto G8 Play", "Motorola Moto G7 Plus", "Motorola Moto G7", "Motorola Moto G6 Plus", "Motorola Moto G6", "Motorola Moto G5 Plus", "Motorola Moto G5", "Motorola Moto G4 Plus", "Motorola Moto G4", "Motorola Moto G4 Play", "Motorola Moto X30 Pro", "Motorola Moto X30", "Motorola Moto X4", "Motorola Moto X3", "Motorola Moto Z4", "Motorola Moto Z3 Play", "Motorola Moto Z3", "Motorola Moto Z2 Force", "Motorola Moto Z2 Play", "Motorola Moto Z", "Motorola Razr 2023", "Motorola Razr 5G", "Motorola Razr", "Motorola Razr 2019", "Motorola Razr 2018", "Motorola Moto E40", "Motorola Moto E32", "Motorola Moto E30", "Motorola Moto E20", "Motorola Moto E7 Power", "Motorola Moto E7", "Motorola Moto E6 Plus", "Motorola Moto E6", "Motorola Moto E5 Plus", "Motorola Moto E5", "Motorola Moto E4 Plus", "Motorola Moto E4", "Motorola Moto E3 Power", "Motorola Moto E3", "Motorola Moto C Plus", "Motorola Moto C", "Motorola Moto Z Force", "Motorola Moto Z Play", "Motorola Moto G5S Plus", "Motorola Moto G5S", "Motorola Moto G4S Plus", "Motorola Moto G4S", "Motorola Moto X Play", "Motorola Moto X Style", "Motorola Moto X", "Motorola Moto Z2 Force Edition", "Motorola Moto G5 Plus Edition", "Motorola Moto Z Play Edition", "Motorola Moto Z3 Play Edition", "Motorola Moto G7 Play", "Motorola Moto G7 Power", "Motorola Moto G6 Play", "Motorola Moto G5S Plus Edition", "Motorola Moto E4 Plus Edition", "Motorola Moto E5 Plus Edition", "Motorola Moto E7 Plus", "Motorola Moto E6 Plus Edition", "Motorola Moto G9 Power Edition", "Motorola Moto G9 Plus Edition", "Motorola Moto G6 Plus Edition", "Motorola Moto E5 Plus Edition", "Motorola Moto X4 Edition", "Motorola Moto E7 Edition", "Motorola Moto Z3 Play Edition", "Outro"],
-  Asus: ["Asus ZenFone 10", "Asus ZenFone 9", "Asus ZenFone 8 Flip", "Asus ZenFone 8", "Asus ZenFone 7 Pro", "Asus ZenFone 7", "Asus ZenFone 6", "Asus ZenFone 5Z", "Asus ZenFone 5", "Asus ZenFone 4 Pro", "Asus ZenFone 4", "Asus ROG Phone 7", "Asus ROG Phone 6 Pro", "Asus ROG Phone 6", "Asus ROG Phone 5 Ultimate", "Asus ROG Phone 5 Pro", "Asus ROG Phone 5", "Asus ROG Phone 3", "Asus ROG Phone 2", "Asus ROG Phone", "Asus ZenFone Max Pro M2", "Asus ZenFone Max Pro M1", "Asus ZenFone Max M2", "Asus ZenFone Max M1", "Asus ZenFone Go", "Asus ZenFone Lite", "Asus ZenFone Zoom S", "Asus ZenFone 4 Max", "Asus ZenFone 4 Selfie Pro", "Asus ZenFone 4 Selfie", "Asus ZenFone 3 Deluxe", "Asus ZenFone 3 Max", "Asus ZenFone 3", "Asus ZenFone 2 Deluxe", "Asus ZenFone 2 Laser", "Asus ZenFone 2", "Asus ZenFone 2E", "Asus ZenFone 1", "Asus ROG Phone 2 Strix Edition", "Asus ZenFone 5 Lite", "Asus ZenFone Selfie", "Asus ZenFone 3 Zoom", "Asus ZenFone Live", "Asus ZenFone 2 Laser Edition", "Asus ZenFone 4 Max Pro", "Asus ZenFone Max Plus (M1)", "Asus ZenFone 3 Deluxe Special Edition", "Asus ZenFone 6Z", "Asus ZenFone 7Z", "Asus ZenFone Max M1", "Asus ZenFone 5Q", "Asus ZenFone 5C", "Asus ZenFone 5A", "Asus ZenFone 4S", "Asus ZenFone AR", "Asus ZenFone Zoom", "Asus ZenFone 3D", "Asus ZenFone 6 Pro", "Asus ZenFone 7 Pro Edition", "Asus ZenFone 7S", "Asus ZenFone 8 Pro", "Asus ZenFone 8 Mini", "Asus ZenFone 8 Ultra", "Asus ROG Phone 5s", "Asus ROG Phone 4", "Asus ZenFone 3S Max", "Asus ZenFone 2E Special Edition", "Asus ZenFone Max Plus Edition", "Asus ZenFone Zoom Special Edition", "Asus ZenFone 4S Pro", "Asus ZenFone 2 Special Edition", "Asus ZenFone Max Pro Edition", "Asus ZenFone 5 Max", "Asus ZenFone 3S Edition", "Asus ZenFone 4 Pro Max", "Asus ZenFone 3 Selfie Pro", "Asus ZenFone 2S", "Asus ZenFone 7 Deluxe", "Asus ZenFone 6 Ultimate", "Asus ZenFone Max M2 Special Edition", "Asus ZenFone 5S", "Asus ZenFone 4 Lite", "Asus ZenFone 3 Deluxe Pro", "Asus ZenFone 4 Max Edition", "Asus ZenFone 3 Deluxe Premium", "Asus ZenFone 6S", "Asus ZenFone Max Pro Plus", "Asus ZenFone 8S", "Asus ZenFone 4 Elite Edition", "Asus ZenFone 3 Pro", "Asus ZenFone 2 Lite", "Outro"],
-  Realme: ["Realme GT 2 Pro", "Realme GT 2", "Realme GT 2 Master Edition", "Realme GT 5G", "Realme GT Neo 3", "Realme GT Neo 2", "Realme GT", "Realme GT Master Edition", "Realme 10 Pro+", "Realme 10 Pro", "Realme 9 Pro+", "Realme 9 Pro", "Realme 9i", "Realme 9", "Realme 8 Pro", "Realme 8 5G", "Realme 8", "Realme 8i", "Realme Narzo 50 Pro 5G", "Realme Narzo 50", "Realme Narzo 30 Pro", "Realme Narzo 30", "Realme Narzo 20 Pro", "Realme Narzo 20", "Realme Narzo 10A", "Realme Narzo 10", "Realme C55", "Realme C53", "Realme C51", "Realme C35", "Realme C31", "Realme C25Y", "Realme C25s", "Realme C25", "Realme C21Y", "Realme C21", "Realme X50 Pro 5G", "Realme X50", "Realme X3 SuperZoom", "Realme X3", "Realme X2 Pro", "Realme X2", "Realme X", "Realme XT", "Realme 7 Pro", "Realme 7", "Realme 7i", "Realme 6 Pro", "Realme 6", "Realme 6i", "Realme 5 Pro", "Realme 5", "Realme 5s", "Realme 3 Pro", "Realme 3", "Realme 3i", "Realme U1", "Realme U2", "Realme V5", "Realme V3", "Realme V11", "Realme V15", "Realme Q3 Pro 5G", "Realme Q3", "Realme Q2 Pro", "Realme Q2", "Realme X50m", "Realme X7 Pro", "Realme X7", "Realme X7 5G", "Realme X", "Realme X50 Pro", "Realme GT Master", "Realme GT Neo 2T", "Realme GT Neo", "Realme GT Neo 2 5G", "Realme GT Neo 3T", "Realme GT Neo 2T 5G", "Realme GT", "Realme GT2", "Realme GT2 Pro", "Realme GT2 Master", "Realme GT 5G", "Realme GT Pro", "Realme 6 Pro Edition", "Realme 9i Pro", "Realme 10i", "Realme 10", "Realme 11 Pro", "Realme 11", "Realme X3 Pro", "Realme X3", "Realme X", "Realme Q4 Pro", "Realme Q3S", "Realme Narzo 40", "Realme 11 5G", "Realme Narzo 11", "Realme Narzo 12", "Realme Narzo 9 Pro", "Realme Narzo 7 Pro", "Outro"],
-  Huawei: ["Huawei P60 Pro", "Huawei P60", "Huawei P50 Pro", "Huawei P50", "Huawei P40 Pro", "Huawei P40", "Huawei P30 Pro", "Huawei P30", "Huawei P20 Pro", "Huawei P20", "Huawei Mate 50 Pro", "Huawei Mate 50", "Huawei Mate 40 Pro", "Huawei Mate 40", "Huawei Mate 30 Pro", "Huawei Mate 30", "Huawei Mate 20 Pro", "Huawei Mate 20", "Huawei Nova 10 Pro", "Huawei Nova 10", "Huawei Nova 9 Pro", "Huawei Nova 9", "Huawei Nova 8 Pro", "Huawei Nova 8", "Huawei Nova 7 Pro", "Huawei Nova 7", "Huawei Nova 6", "Huawei Nova 5T", "Huawei Nova 5 Pro", "Huawei Nova 5", "Huawei Nova 4", "Huawei Nova 3i", "Huawei Nova 3", "Huawei Honor 90 Pro", "Huawei Honor 90", "Huawei Honor 80 Pro", "Huawei Honor 80", "Huawei Honor 70 Pro", "Huawei Honor 70", "Huawei Honor 60 Pro", "Huawei Honor 60", "Huawei Honor 50 Pro", "Huawei Honor 50", "Huawei Honor 30 Pro", "Huawei Honor 30", "Huawei Honor 20 Pro", "Huawei Honor 20", "Huawei Honor 10 Lite", "Huawei Honor 10", "Huawei Honor 9X Pro", "Huawei Honor 9X", "Huawei Honor 8X", "Huawei Honor 8", "Huawei Honor View 20", "Huawei Honor View 10", "Huawei Honor 7X", "Huawei Honor 7", "Huawei Honor 6X", "Huawei Honor 6", "Huawei Y90", "Huawei Y80", "Huawei Y70", "Huawei Y60", "Huawei Y50", "Huawei Y40", "Huawei Y30", "Huawei Y20 Pro", "Huawei Y20", "Huawei Y10", "Huawei Y9s", "Huawei Y9", "Huawei Y8s", "Huawei Y8", "Huawei Y7 Pro", "Huawei Y7", "Huawei Y6s", "Huawei Y6", "Huawei Y5s", "Huawei Y5", "Huawei Y4", "Huawei Y3", "Huawei Mate Xs", "Huawei Mate X", "Huawei Mate X2", "Huawei Mate 20 X", "Huawei Mate 10 X", "Huawei Mate 9 X", "Huawei Mate 7", "Huawei Mate 6", "Huawei Mate 5", "Huawei Mate 4", "Huawei Mate 3", "Huawei Mate 2", "Huawei Mate 1", "Huawei P40 Lite", "Huawei P30 Lite", "Huawei P20 Lite", "Huawei P10 Lite", "Huawei P9 Lite", "Huawei P8 Lite", "Huawei P7 Lite", "Huawei P6", "Huawei P5", "Huawei P4", "Huawei P3", "Huawei P2",],
-  LG: ["LG Velvet", "LG V60 ThinQ", "LG V50 ThinQ", "LG V40 ThinQ", "LG V30", "LG V20", "LG G8 ThinQ", "LG G7 ThinQ", "LG G6", "LG G5", "LG G4", "LG G3", "LG G2", "LG Q60", "LG Q52", "LG Q51", "LG Q9", "LG Q8", "LG Q7", "LG Q6", "LG X Power 2", "LG X Power", "LG X Cam", "LG X Screen", "LG K92 5G", "LG K61", "LG K51", "LG K41", "LG K40", "LG K20", "LG K10", "LG K8", "LG K7", "LG K5", "LG K4", "LG K3", "LG Stylo 6", "LG Stylo 5", "LG Stylo 4", "LG Stylo 3", "LG Stylo 2", "LG Stylo", "LG Optimus G Pro", "LG Optimus G", "LG Optimus F7", "LG Optimus F5", "LG Optimus L7", "LG Optimus L5", "LG Optimus L3", "LG Optimus 2X", "LG G Flex 2", "LG G Flex", "LG Nexus 5X", "LG Nexus 4", "LG V10", "LG G3 Beat", "LG G2 Mini", "LG V30+", "LG V20", "LG Nexus 5", "LG Nexus 6", "LG G4 Beat", "LG K40S", "LG K50S", "LG K30", "LG X4", "LG X2", "LG K31", "LG K35", "LG X500", "LG X4+", "LG X5", "LG X6", "LG X7", "LG X8", "LG X9", "LG G8X ThinQ", "LG G8S ThinQ", "LG G7 Fit", "LG G7 One", "LG G6+","LG G5 SE", "LG G4 Stylus", "LG G4c", "LG G4s", "LG G3 Stylus", "LG G3 Beat", "LG G2 Pro", "LG V60 ThinQ 5G", "LG V50", "LG V40", "LG V35", "LG K20 Plus", "LG K10 Plus", "LG K7 Plus", "LG K4 Plus", "LG G Flex 3", "LG Q8", "LG Q7+", "LG Q7 Fit", "LG Q6+", "LG Q6 Alpha", "LG Q60", "LG Q9+", "LG G5 SE", "LG G4s", "LG G3 Dual", "LG G3 D855", "LG Optimus L3 Dual", "LG Optimus L5 Dual", "LG Optimus L7 Dual", "LG L90", "LG L70", "LG L60", "Outro"],
-  Sony: ["Xperia 1 IV", "Xperia 1 III", "Xperia 1 II", "Xperia 1", "Xperia 10 IV", "Xperia 10 III", "Xperia 10 II", "Xperia 10", "Xperia 5 IV", "Xperia 5 III", "Xperia 5 II", "Xperia 5", "Xperia 8", "Xperia 8 Lite", "Xperia XZ Premium", "Xperia XZ2 Premium", "Xperia XZ2", "Xperia XZ1", "Xperia XZ", "Xperia X Performance", "Xperia X", "Xperia Z5 Premium", "Xperia Z5", "Xperia Z3+", "Xperia Z3", "Xperia Z2", "Xperia Z1 Compact", "Xperia Z1", "Xperia Z Ultra", "Xperia Z", "Xperia M5", "Xperia M4 Aqua", "Xperia M2 Aqua", "Xperia M2", "Xperia E5", "Xperia E4", "Xperia E3", "Xperia E2", "Xperia E", "Xperia L3", "Xperia L2", "Xperia L1", "Xperia T3", "Xperia T2 Ultra", "Xperia T", "Xperia ZR", "Xperia V", "Xperia J", "Xperia U", "Xperia Tipo", "Xperia Acro HD", "Xperia Ion", "Xperia Ray", "Xperia Play", "Xperia Neo L", "Xperia Neo", "Xperia Arc S", "Xperia Arc", "Xperia XZ2 Compact", "Xperia XZ1 Compact", "Xperia XZ Compact", "Xperia XA2 Plus", "Xperia XA2 Ultra", "Xperia XA2", "Xperia XA1 Plus", "Xperia XA1 Ultra", "Xperia XA1", "Xperia Z5 Compact", "Xperia Z3 Compact", "Xperia Z2 Compact", "Xperia X Compact", "Xperia XZ3", "Xperia XZ1", "Xperia XZ2", "Xperia X", "Xperia Z5 Premium", "Xperia Z5", "Xperia L4", "Xperia L5", "Xperia L", "Xperia E3", "Xperia Z3 Compact", "Xperia 10 Plus", "Xperia 10", "Xperia 1 II", "Xperia 1 III", "Xperia 1 IV", "Xperia 5 III", "Xperia 5 II", "Xperia 5", "Xperia 10 II", "Xperia 10", "Xperia 8 Lite", "Xperia XZ4", "Xperia 7", "Xperia 7 Plus", "Xperia T3", "Xperia XZ2", "Xperia 6", "Xperia 5 Plus", "Xperia XA Ultra", "Xperia X1", "Xperia XZ Premium", "Xperia Z1", "Xperia Z2", "Outro"],
-  Infinix: ["Infinix Zero 30", "Infinix Zero 20", "Infinix Zero 10", "Infinix Zero 8i", "Infinix Zero 8", "Infinix Note 12 Pro", "Infinix Note 12", "Infinix Note 11 Pro", "Infinix Note 11", "Infinix Note 10 Pro", "Infinix Note 10", "Infinix Note 9 Pro", "Infinix Note 9", "Infinix Note 8i", "Infinix Note 8", "Infinix Hot 12 Pro", "Infinix Hot 12", "Infinix Hot 11S", "Infinix Hot 11", "Infinix Hot 10 Play", "Infinix Hot 10T", "Infinix Hot 10", "Infinix Smart 6 Plus", "Infinix Smart 6", "Infinix Smart 5", "Infinix Smart 4", "Infinix Smart 3 Plus", "Infinix Smart 3", "Infinix S5 Pro", "Infinix S5", "Infinix S4", "Infinix S3", "Infinix S2 Pro", "Infinix S2", "Infinix Hot 9 Pro", "Infinix Hot 9", "Infinix Hot 8 Pro", "Infinix Hot 8", "Infinix Hot 7 Pro", "Infinix Hot 7", "Infinix Hot 6 Pro", "Infinix Hot 6", "Infinix Hot 5 Pro", "Infinix Hot 5", "Infinix Hot 4 Pro", "Infinix Hot 4", "Infinix Zero 6 Pro", "Infinix Zero 6", "Infinix Zero 5 Pro", "Infinix Zero 5", "Infinix Zero 4 Pro", "Infinix Zero 4", "Infinix Zero 3", "Infinix Zero 2", "Infinix Zero", "Infinix X6511", "Infinix X657", "Infinix X660", "Infinix X660B", "Infinix X6810", "Infinix X6820", "Infinix X690", "Infinix X691", "Infinix X695", "Infinix X700", "Infinix X700B", "Infinix X800", "Infinix X801", "Infinix X900", "Infinix X901", "Infinix X1000", "Infinix X1001", "Infinix X2000", "Infinix X2001", "Infinix X4000", "Infinix X4001", "Infinix X5000", "Infinix X5001", "Infinix X6000", "Infinix X6001", "Infinix X7000", "Infinix X7001", "Infinix X8000", "Infinix X8001", "Infinix X9000", "Infinix X9001", "Infinix X10000", "Infinix X10001", "Infinix X15000", "Infinix X15001", "Infinix X20000", "Infinix X20001", "Infinix X25000", "Infinix X25001", "Infinix X30000", "Infinix X30001", "Infinix X35000", "Infinix X35001", "Infinix X40000", "Infinix X40001", "Outro"]
+/* ====================== BASE DE APARELHOS ====================== */
+const DB = {
+"Apple":["iPhone 17 Pro Max","iPhone 17 Pro","iPhone 17 Air","iPhone 17","iPhone 16 Pro Max","iPhone 16 Pro","iPhone 16 Plus","iPhone 16","iPhone 16e","iPhone 15 Pro Max","iPhone 15 Pro","iPhone 15 Plus","iPhone 15","iPhone 14 Pro Max","iPhone 14 Pro","iPhone 14 Plus","iPhone 14","iPhone 13 Pro Max","iPhone 13 Pro","iPhone 13","iPhone 13 mini","iPhone 12 Pro Max","iPhone 12 Pro","iPhone 12","iPhone 12 mini","iPhone SE (3ª geração)","iPhone SE (2ª geração)","iPhone SE (1ª geração)","iPhone 11 Pro Max","iPhone 11 Pro","iPhone 11","iPhone XS Max","iPhone XS","iPhone XR","iPhone X","iPhone 8 Plus","iPhone 8","iPhone 7 Plus","iPhone 7","iPhone 6s Plus","iPhone 6s","iPad Pro 13 (M4)","iPad Pro 12.9","iPad Pro 11","iPad Air (M2)","iPad Air","iPad 10","iPad 9","iPad mini 6","Outro modelo"],
+"Samsung":["Galaxy S26 Ultra","Galaxy S26+","Galaxy S26","Galaxy S25 Ultra","Galaxy S25+","Galaxy S25","Galaxy S25 Edge","Galaxy S25 FE","Galaxy S24 Ultra","Galaxy S24+","Galaxy S24","Galaxy S24 FE","Galaxy S23 Ultra","Galaxy S23+","Galaxy S23","Galaxy S23 FE","Galaxy S22 Ultra","Galaxy S22+","Galaxy S22","Galaxy S21 Ultra","Galaxy S21+","Galaxy S21","Galaxy S21 FE","Galaxy S20 Ultra","Galaxy S20+","Galaxy S20","Galaxy S20 FE","Galaxy S10+","Galaxy S10","Galaxy S10e","Galaxy S10 Lite","Galaxy S9+","Galaxy S9","Galaxy S8+","Galaxy S8","Galaxy S7 Edge","Galaxy S7","Galaxy Note 20 Ultra","Galaxy Note 20","Galaxy Note 10+","Galaxy Note 10","Galaxy Note 10 Lite","Galaxy Note 9","Galaxy Note 8","Galaxy Z Fold 7","Galaxy Z Fold 6","Galaxy Z Fold 5","Galaxy Z Fold 4","Galaxy Z Fold 3","Galaxy Z Fold 2","Galaxy Z Flip 7","Galaxy Z Flip 6","Galaxy Z Flip 5","Galaxy Z Flip 4","Galaxy Z Flip 3","Galaxy A56","Galaxy A55","Galaxy A54","Galaxy A53","Galaxy A52s","Galaxy A52","Galaxy A51","Galaxy A50","Galaxy A36","Galaxy A35","Galaxy A34","Galaxy A33","Galaxy A32","Galaxy A31","Galaxy A30s","Galaxy A30","Galaxy A26","Galaxy A25","Galaxy A24","Galaxy A23","Galaxy A22","Galaxy A21s","Galaxy A20s","Galaxy A20","Galaxy A16","Galaxy A15","Galaxy A14","Galaxy A13","Galaxy A12","Galaxy A11","Galaxy A10s","Galaxy A10","Galaxy A06","Galaxy A05s","Galaxy A05","Galaxy A04s","Galaxy A04","Galaxy A03s","Galaxy A03 Core","Galaxy A03","Galaxy A02s","Galaxy A01","Galaxy A73","Galaxy A72","Galaxy A71","Galaxy A70","Galaxy A9 (2018)","Galaxy A8+","Galaxy A7 (2018)","Galaxy A6+","Galaxy A6","Galaxy M55","Galaxy M54","Galaxy M53","Galaxy M52","Galaxy M51","Galaxy M35","Galaxy M34","Galaxy M33","Galaxy M32","Galaxy M31","Galaxy M30s","Galaxy M23","Galaxy M22","Galaxy M21","Galaxy M15","Galaxy M14","Galaxy M13","Galaxy M12","Galaxy M11","Galaxy M04","Galaxy XCover 7","Galaxy XCover 6 Pro","Galaxy XCover 5","Galaxy J8","Galaxy J7 Prime","Galaxy J7 Pro","Galaxy J7","Galaxy J6+","Galaxy J6","Galaxy J5 Prime","Galaxy J5","Galaxy J4+","Galaxy J4","Galaxy J2 Core","Galaxy Tab S10 Ultra","Galaxy Tab S9","Galaxy Tab S8","Galaxy Tab S7","Galaxy Tab S6 Lite","Galaxy Tab A9+","Galaxy Tab A8","Outro modelo"],
+"Xiaomi":["Xiaomi 15 Ultra","Xiaomi 15 Pro","Xiaomi 15","Xiaomi 15T Pro","Xiaomi 15T","Xiaomi 14 Ultra","Xiaomi 14 Pro","Xiaomi 14","Xiaomi 14T Pro","Xiaomi 14T","Xiaomi 13 Ultra","Xiaomi 13 Pro","Xiaomi 13","Xiaomi 13T Pro","Xiaomi 13T","Xiaomi 13 Lite","Xiaomi 12S Ultra","Xiaomi 12 Pro","Xiaomi 12","Xiaomi 12T Pro","Xiaomi 12T","Xiaomi 12X","Xiaomi 12 Lite","Xiaomi 11T Pro","Xiaomi 11T","Xiaomi 11 Lite 5G NE","Xiaomi Mi 11 Ultra","Xiaomi Mi 11","Xiaomi Mi 11 Lite","Xiaomi Mi 10T Pro","Xiaomi Mi 10T","Xiaomi Mi 10","Xiaomi Mi 9T Pro","Xiaomi Mi 9T","Xiaomi Mi 9","Xiaomi Mi 8","Xiaomi Mi A3","Xiaomi Mi A2","Xiaomi Mi Mix Fold 4","Xiaomi Mi Mix Fold 3","Xiaomi Mi Mix 4","Xiaomi Mi Mix 3","Xiaomi Civi 4 Pro","Xiaomi Civi 3","Xiaomi Civi 2","Xiaomi Mi Play","Xiaomi Mi Max 3","Xiaomi Mi Note 10","Xiaomi Black Shark 5 Pro","Xiaomi Black Shark 5","Xiaomi Black Shark 4 Pro","Xiaomi Black Shark 4","Xiaomi Black Shark 3","Outro modelo"],
+"Redmi":["Redmi Note 15 Pro+","Redmi Note 15 Pro","Redmi Note 15","Redmi Note 14 Pro+ 5G","Redmi Note 14 Pro","Redmi Note 14","Redmi Note 13 Pro+ 5G","Redmi Note 13 Pro 5G","Redmi Note 13 Pro","Redmi Note 13 5G","Redmi Note 13","Redmi Note 12 Pro+","Redmi Note 12 Pro","Redmi Note 12S","Redmi Note 12 5G","Redmi Note 12","Redmi Note 11 Pro+","Redmi Note 11 Pro","Redmi Note 11S","Redmi Note 11","Redmi Note 10 Pro","Redmi Note 10S","Redmi Note 10 5G","Redmi Note 10","Redmi Note 9 Pro","Redmi Note 9S","Redmi Note 9","Redmi Note 8 Pro","Redmi Note 8 (2021)","Redmi Note 8","Redmi Note 7 Pro","Redmi Note 7","Redmi Note 6 Pro","Redmi Note 5 Pro","Redmi Note 5","Redmi Note 4","Redmi K80 Pro","Redmi K80","Redmi K70 Ultra","Redmi K70 Pro","Redmi K70","Redmi K60 Pro","Redmi K60","Redmi K50 Gaming","Redmi K50 Pro","Redmi K50","Redmi K40 Gaming","Redmi K40 Pro","Redmi K40","Redmi K30 Pro","Redmi K30","Redmi K20 Pro","Redmi 15C","Redmi 14C","Redmi 13C","Redmi 13","Redmi 12C","Redmi 12","Redmi 11 Prime","Redmi 10C","Redmi 10 2022","Redmi 10","Redmi 9C","Redmi 9A","Redmi 9T","Redmi 9","Redmi 8A","Redmi 8","Redmi 7A","Redmi 7","Redmi 6A","Redmi 6","Redmi 5 Plus","Redmi 5A","Redmi A5","Redmi A4","Redmi A3","Redmi A2+","Redmi A2","Redmi A1+","Redmi A1","Redmi Turbo 4 Pro","Redmi Turbo 4","Redmi Turbo 3","Redmi Pad SE","Redmi Pad Pro","Outro modelo"],
+"POCO":["POCO F7 Ultra","POCO F7 Pro","POCO F7","POCO F6 Pro","POCO F6","POCO F5 Pro","POCO F5","POCO F4 GT","POCO F4","POCO F3 GT","POCO F3","POCO F2 Pro","POCO F1","POCO X7 Pro","POCO X7","POCO X6 Pro","POCO X6","POCO X5 Pro","POCO X5","POCO X4 GT","POCO X4 Pro","POCO X3 GT","POCO X3 Pro","POCO X3 NFC","POCO X3","POCO X2","POCO M7 Pro","POCO M6 Pro","POCO M6 Plus","POCO M6","POCO M5s","POCO M5","POCO M4 Pro 5G","POCO M4 Pro","POCO M4 5G","POCO M3 Pro","POCO M3","POCO M2 Pro","POCO M2","POCO C75","POCO C71","POCO C65","POCO C61","POCO C55","POCO C51","POCO C50","POCO C40","POCO C31","POCO C3","Outro modelo"],
+"Motorola":["Moto Edge 60 Ultra","Moto Edge 60 Pro","Moto Edge 60 Fusion","Moto Edge 60","Moto Edge 50 Ultra","Moto Edge 50 Pro","Moto Edge 50 Fusion","Moto Edge 50 Neo","Moto Edge 50","Moto Edge 40 Pro","Moto Edge 40 Neo","Moto Edge 40","Moto Edge 30 Ultra","Moto Edge 30 Pro","Moto Edge 30 Fusion","Moto Edge 30 Neo","Moto Edge 30","Moto Edge 20 Pro","Moto Edge 20 Lite","Moto Edge 20","Moto Edge+ (2023)","Moto Edge+ (2022)","Moto Edge S30","Moto Edge","Moto G96","Moto G86 Power","Moto G85","Moto G84","Moto G82","Moto G73","Moto G72","Moto G71","Moto G200","Moto G100","Moto G62","Moto G60s","Moto G60","Moto G55","Moto G54","Moto G53","Moto G52","Moto G51","Moto G50","Moto G45","Moto G42","Moto G41","Moto G40 Fusion","Moto G35","Moto G34","Moto G32","Moto G31","Moto G30","Moto G24 Power","Moto G24","Moto G23","Moto G22","Moto G20","Moto G15","Moto G14","Moto G13","Moto G10","Moto G9 Power","Moto G9 Plus","Moto G9 Play","Moto G8 Power","Moto G8 Plus","Moto G8 Play","Moto G8","Moto G7 Power","Moto G7 Plus","Moto G7 Play","Moto G7","Moto G6 Plus","Moto G6 Play","Moto G6","Moto G5S Plus","Moto G5 Plus","Moto G5","Moto G4 Plus","Moto G4 Play","Moto E15","Moto E14","Moto E13","Moto E32","Moto E22","Moto E20","Moto E7 Power","Moto E7 Plus","Moto E7","Moto E6 Plus","Moto E6 Play","Moto E5 Plus","Moto E5","Moto One Fusion+","Moto One Action","Moto One Vision","Moto One Macro","Moto One Zoom","Moto One","Moto Razr 60 Ultra","Moto Razr 50 Ultra","Moto Razr 40 Ultra","Moto Razr 40","Moto Razr 2023","Moto Z3 Play","Moto Z2 Play","Outro modelo"],
+"Realme":["Realme GT 7 Pro","Realme GT 7","Realme GT 6","Realme GT 5 Pro","Realme GT 5","Realme GT Neo 6","Realme GT Neo 5","Realme GT Neo 3T","Realme GT Neo 3","Realme GT Neo 2","Realme GT 2 Pro","Realme GT 2","Realme GT Master Edition","Realme GT 5G","Realme 14 Pro+","Realme 14 Pro","Realme 14","Realme 13 Pro+","Realme 13 Pro","Realme 13+","Realme 13","Realme 12 Pro+","Realme 12 Pro","Realme 12+","Realme 12","Realme 11 Pro+","Realme 11 Pro","Realme 11","Realme 10 Pro+","Realme 10 Pro","Realme 10","Realme 9 Pro+","Realme 9 Pro","Realme 9i","Realme 9","Realme 8 Pro","Realme 8 5G","Realme 8i","Realme 8","Realme 7 Pro","Realme 7i","Realme 7","Realme 6 Pro","Realme 6i","Realme 6","Realme 5 Pro","Realme 5i","Realme 5","Realme C75","Realme C67","Realme C65","Realme C63","Realme C61","Realme C55","Realme C53","Realme C51","Realme C35","Realme C33","Realme C31","Realme C30","Realme C25Y","Realme C25s","Realme C25","Realme C21Y","Realme C21","Realme C20","Realme C15","Realme C12","Realme C11","Realme C3","Realme Narzo 70 Pro","Realme Narzo 70","Realme Narzo 60 Pro","Realme Narzo 60","Realme Narzo 50 Pro","Realme Narzo 50A","Realme Narzo 50","Realme Narzo 30 Pro","Realme Narzo 30A","Realme Narzo 30","Realme Narzo 20 Pro","Realme Narzo 20","Realme X7 Pro","Realme X7","Realme X50 Pro","Realme X50","Realme X3 SuperZoom","Realme X2 Pro","Realme XT","Realme P3 Pro","Realme P2 Pro","Realme P1 Pro","Outro modelo"],
+"Oppo":["Oppo Find X8 Pro","Oppo Find X8","Oppo Find X7 Ultra","Oppo Find X7","Oppo Find X6 Pro","Oppo Find X6","Oppo Find X5 Pro","Oppo Find X5","Oppo Find X3 Pro","Oppo Find X3 Neo","Oppo Find X3 Lite","Oppo Find X2 Pro","Oppo Find X2","Oppo Find N5","Oppo Find N3 Flip","Oppo Find N3","Oppo Find N2 Flip","Oppo Reno 13 Pro","Oppo Reno 13","Oppo Reno 12 Pro","Oppo Reno 12","Oppo Reno 11 Pro","Oppo Reno 11","Oppo Reno 10 Pro+","Oppo Reno 10 Pro","Oppo Reno 10","Oppo Reno 8 Pro","Oppo Reno 8T","Oppo Reno 8","Oppo Reno 7 Pro","Oppo Reno 7","Oppo Reno 6 Pro","Oppo Reno 6","Oppo Reno 5 Pro","Oppo Reno 5","Oppo Reno 4 Pro","Oppo Reno 4","Oppo Reno 3 Pro","Oppo Reno 2","Oppo A98","Oppo A96","Oppo A94","Oppo A79","Oppo A78","Oppo A77","Oppo A76","Oppo A74","Oppo A58","Oppo A57","Oppo A55","Oppo A54","Oppo A53","Oppo A38","Oppo A31","Oppo A17","Oppo A16","Oppo A15","Oppo A9 2020","Oppo A5 2020","Oppo K12","Oppo K11","Oppo K10","Outro modelo"],
+"Vivo":["Vivo X200 Pro","Vivo X200","Vivo X100 Pro","Vivo X100","Vivo X90 Pro+","Vivo X90 Pro","Vivo X90","Vivo X80 Pro","Vivo X80","Vivo X70 Pro+","Vivo X70 Pro","Vivo X60 Pro","Vivo X60","Vivo X50 Pro","Vivo X50","Vivo X Fold 3 Pro","Vivo X Fold 2","Vivo V40 Pro","Vivo V40","Vivo V30 Pro","Vivo V30","Vivo V29 Pro","Vivo V29","Vivo V27 Pro","Vivo V27","Vivo V25 Pro","Vivo V25","Vivo V23 Pro","Vivo V23","Vivo V21","Vivo V20 Pro","Vivo V20","Vivo Y300","Vivo Y200","Vivo Y100","Vivo Y78","Vivo Y77","Vivo Y76","Vivo Y75","Vivo Y72","Vivo Y56","Vivo Y53s","Vivo Y52","Vivo Y51","Vivo Y36","Vivo Y35","Vivo Y33s","Vivo Y31","Vivo Y30","Vivo Y28","Vivo Y27","Vivo Y22","Vivo Y21","Vivo Y20","Vivo Y17","Vivo Y16","Vivo Y15","Vivo Y12","Vivo S18 Pro","Vivo S17","Vivo T3 Ultra","Vivo T2","Outro modelo"],
+"iQOO":["iQOO 13","iQOO 12 Pro","iQOO 12","iQOO 11 Pro","iQOO 11","iQOO 10 Pro","iQOO 10","iQOO 9 Pro","iQOO 9T","iQOO 9","iQOO 8 Pro","iQOO 8","iQOO 7","iQOO Neo 10 Pro","iQOO Neo 9 Pro","iQOO Neo 9","iQOO Neo 8 Pro","iQOO Neo 8","iQOO Neo 7 Pro","iQOO Neo 7","iQOO Neo 6","iQOO Neo 5","iQOO Z9 Turbo","iQOO Z9","iQOO Z8","iQOO Z7 Pro","iQOO Z7","iQOO Z6 Pro","iQOO Z6","iQOO Z5","iQOO Z3","Outro modelo"],
+"OnePlus":["OnePlus 13","OnePlus 13R","OnePlus 12","OnePlus 12R","OnePlus 11","OnePlus 11R","OnePlus 10 Pro","OnePlus 10T","OnePlus 10R","OnePlus 9 Pro","OnePlus 9R","OnePlus 9","OnePlus 8 Pro","OnePlus 8T","OnePlus 8","OnePlus 7T Pro","OnePlus 7T","OnePlus 7 Pro","OnePlus 7","OnePlus 6T","OnePlus 6","OnePlus 5T","OnePlus 5","OnePlus Open","OnePlus Nord 4","OnePlus Nord 3","OnePlus Nord 2T","OnePlus Nord 2","OnePlus Nord","OnePlus Nord CE 4","OnePlus Nord CE 3","OnePlus Nord CE 2 Lite","OnePlus Nord CE 2","OnePlus Nord CE","OnePlus Nord N30","OnePlus Nord N20","OnePlus Nord N10","OnePlus Ace 3 Pro","OnePlus Ace 3","OnePlus Ace 2 Pro","OnePlus Ace 2","Outro modelo"],
+"Google":["Pixel 10 Pro XL","Pixel 10 Pro","Pixel 10","Pixel 9 Pro Fold","Pixel 9 Pro XL","Pixel 9 Pro","Pixel 9","Pixel 8 Pro","Pixel 8a","Pixel 8","Pixel Fold","Pixel 7 Pro","Pixel 7a","Pixel 7","Pixel 6 Pro","Pixel 6a","Pixel 6","Pixel 5a","Pixel 5","Pixel 4a 5G","Pixel 4a","Pixel 4 XL","Pixel 4","Pixel 3a XL","Pixel 3a","Pixel 3 XL","Pixel 3","Pixel 2 XL","Pixel 2","Outro modelo"],
+"Honor":["Honor Magic 7 Pro","Honor Magic 7","Honor Magic 6 Pro","Honor Magic 6","Honor Magic 5 Pro","Honor Magic 5","Honor Magic 4 Pro","Honor Magic 4","Honor Magic V3","Honor Magic V2","Honor Magic Vs","Honor 200 Pro","Honor 200","Honor 100 Pro","Honor 100","Honor 90 Pro","Honor 90","Honor 80 Pro","Honor 80","Honor 70 Pro","Honor 70","Honor 60 Pro","Honor 60","Honor 50 Pro","Honor 50","Honor X9c","Honor X9b","Honor X9a","Honor X8b","Honor X8","Honor X7b","Honor X7","Honor X6","Honor X5","Honor Play 9T","Honor Play 8T","Honor Play 7T","Honor 9X Pro","Honor 9X","Honor 8X","Honor View 20","Honor View 10","Honor 10 Lite","Honor 10","Honor 9 Lite","Honor 8A","Honor 7X","Honor 6X","Outro modelo"],
+"Huawei":["Huawei Mate 70 Pro+","Huawei Mate 70 Pro","Huawei Mate 70","Huawei Mate 60 Pro+","Huawei Mate 60 Pro","Huawei Mate 60","Huawei Mate 50 Pro","Huawei Mate 50","Huawei Mate 40 Pro","Huawei Mate 40","Huawei Mate 30 Pro","Huawei Mate 30","Huawei Mate 20 Pro","Huawei Mate 20 X","Huawei Mate 20","Huawei Mate 10 Pro","Huawei Mate X5","Huawei Mate X3","Huawei Mate Xs 2","Huawei P70 Pro","Huawei P70","Huawei P60 Pro","Huawei P60","Huawei P50 Pro","Huawei P50","Huawei P40 Pro+","Huawei P40 Pro","Huawei P40 Lite","Huawei P40","Huawei P30 Pro","Huawei P30 Lite","Huawei P30","Huawei P20 Pro","Huawei P20 Lite","Huawei P20","Huawei P10 Lite","Huawei Nova 13 Pro","Huawei Nova 12 Pro","Huawei Nova 12","Huawei Nova 11 Pro","Huawei Nova 11","Huawei Nova 10 Pro","Huawei Nova 10","Huawei Nova 9","Huawei Nova 8","Huawei Nova 7","Huawei Nova 5T","Huawei Nova 3i","Huawei Y9 Prime","Huawei Y9","Huawei Y7","Huawei Y6","Huawei Y5","Outro modelo"],
+"Asus":["Asus ROG Phone 9 Pro","Asus ROG Phone 9","Asus ROG Phone 8 Pro","Asus ROG Phone 8","Asus ROG Phone 7 Ultimate","Asus ROG Phone 7","Asus ROG Phone 6D","Asus ROG Phone 6 Pro","Asus ROG Phone 6","Asus ROG Phone 5s Pro","Asus ROG Phone 5s","Asus ROG Phone 5 Ultimate","Asus ROG Phone 5","Asus ROG Phone 3","Asus ROG Phone 2","Asus ROG Phone","Asus Zenfone 11 Ultra","Asus Zenfone 10","Asus Zenfone 9","Asus Zenfone 8 Flip","Asus Zenfone 8","Asus Zenfone 7 Pro","Asus Zenfone 7","Asus Zenfone 6","Asus Zenfone 5Z","Asus Zenfone 5","Asus Zenfone 4 Max","Asus Zenfone 4","Asus Zenfone Max Pro M2","Asus Zenfone Max Pro M1","Asus Zenfone Max Plus M2","Asus Zenfone Max M2","Asus Zenfone Max M1","Asus Zenfone Live","Asus Zenfone Selfie","Asus Zenfone 3 Zoom","Asus Zenfone 3 Max","Asus Zenfone 3 Deluxe","Asus Zenfone 3","Asus Zenfone 2 Laser","Asus Zenfone 2","Asus Zenfone Go","Outro modelo"],
+"Nothing":["Nothing Phone (3)","Nothing Phone (2a) Plus","Nothing Phone (2a)","Nothing Phone (2)","Nothing Phone (1)","CMF Phone 2 Pro","CMF Phone 1","Outro modelo"],
+"Sony":["Xperia 1 VII","Xperia 1 VI","Xperia 1 V","Xperia 1 IV","Xperia 1 III","Xperia 1 II","Xperia 1","Xperia 5 V","Xperia 5 IV","Xperia 5 III","Xperia 5 II","Xperia 5","Xperia 10 VI","Xperia 10 V","Xperia 10 IV","Xperia 10 III","Xperia 10 II","Xperia 10 Plus","Xperia 10","Xperia Pro-I","Xperia XZ3","Xperia XZ2 Premium","Xperia XZ2 Compact","Xperia XZ2","Xperia XZ1 Compact","Xperia XZ1","Xperia XZ Premium","Xperia XZs","Xperia XZ","Xperia XA2 Ultra","Xperia XA2 Plus","Xperia XA2","Xperia XA1 Ultra","Xperia XA1","Xperia XA","Xperia X Performance","Xperia X Compact","Xperia X","Xperia Z5 Premium","Xperia Z5 Compact","Xperia Z5","Xperia Z3+","Xperia Z3 Compact","Xperia Z3","Xperia Z2","Xperia Z1","Outro modelo"],
+"LG":["LG Velvet 5G","LG Velvet","LG Wing","LG V60 ThinQ","LG V50S ThinQ","LG V50 ThinQ","LG V40 ThinQ","LG V35 ThinQ","LG V30+","LG V30","LG V20","LG V10","LG G8X ThinQ","LG G8S ThinQ","LG G8 ThinQ","LG G7 ThinQ","LG G6+","LG G6","LG G5","LG G4","LG G3","LG G2","LG K92 5G","LG K71","LG K62","LG K61","LG K52","LG K51S","LG K50S","LG K42","LG K41S","LG K40S","LG K40","LG K22","LG K12 Max","LG K12+","LG K11+","LG K10","LG K9","LG K8","LG Q92","LG Q70","LG Q60","LG Q6+","LG Q6","LG Stylo 6","LG Stylo 5","LG Stylus 3","LG Stylus 2","LG Nexus 5X","LG G Flex 2","Outro modelo"],
+"Nokia":["Nokia XR21","Nokia X30","Nokia X20","Nokia X10","Nokia G60","Nokia G50","Nokia G42","Nokia G22","Nokia G21","Nokia G20","Nokia G11","Nokia G10","Nokia C32","Nokia C31","Nokia C30","Nokia C22","Nokia C21 Plus","Nokia C20","Nokia C12","Nokia C10","Nokia 8.3 5G","Nokia 8.1","Nokia 8","Nokia 7.2","Nokia 7.1","Nokia 6.2","Nokia 6.1 Plus","Nokia 6.1","Nokia 5.4","Nokia 5.3","Nokia 5.1 Plus","Nokia 4.2","Nokia 3.4","Nokia 3.2","Nokia 2.4","Nokia 2.3","Nokia 2.2","Nokia 1 Plus","Outro modelo"],
+"TCL":["TCL 50 Pro NXTPAPER","TCL 50 SE","TCL 50","TCL 40 NXTPAPER","TCL 40 SE","TCL 40R","TCL 30+","TCL 30 SE","TCL 30","TCL 20 Pro 5G","TCL 20L+","TCL 20L","TCL 20 SE","TCL 20E","TCL 10 Pro","TCL 10L","TCL 10 SE","TCL L10 Pro","TCL 306","TCL 305","TCL 303","Outro modelo"],
+"ZTE / nubia":["nubia Z70 Ultra","nubia Z60 Ultra","nubia Z50 Ultra","nubia Z50","nubia Z40 Pro","RedMagic 10 Pro","RedMagic 9 Pro","RedMagic 8 Pro","RedMagic 7 Pro","RedMagic 7","RedMagic 6 Pro","RedMagic 6","RedMagic 5G","nubia Neo 3","nubia Neo 2","nubia Music","ZTE Blade V50","ZTE Blade V40","ZTE Blade V30","ZTE Blade A75","ZTE Blade A73","ZTE Blade A72","ZTE Blade A71","ZTE Blade A54","ZTE Blade A53","ZTE Blade A52","ZTE Blade A51","ZTE Blade A31","ZTE Axon 40 Ultra","ZTE Axon 30 Ultra","ZTE Axon 30","Outro modelo"],
+"Infinix":["Infinix Note 50 Pro+","Infinix Note 50 Pro","Infinix Note 50","Infinix Note 40 Pro+","Infinix Note 40 Pro","Infinix Note 40","Infinix Note 30 Pro","Infinix Note 30 VIP","Infinix Note 30","Infinix Note 12 Pro","Infinix Note 12","Infinix Note 11 Pro","Infinix Note 11","Infinix Note 10 Pro","Infinix Note 10","Infinix Note 8","Infinix Zero 40","Infinix Zero 30","Infinix Zero 20","Infinix Zero Ultra","Infinix Zero 5G","Infinix Zero X Pro","Infinix Zero 8","Infinix GT 30 Pro","Infinix GT 20 Pro","Infinix GT 10 Pro","Infinix Hot 50 Pro","Infinix Hot 50","Infinix Hot 40 Pro","Infinix Hot 40","Infinix Hot 30i","Infinix Hot 30","Infinix Hot 20","Infinix Hot 12 Pro","Infinix Hot 12","Infinix Hot 11S","Infinix Hot 11","Infinix Hot 10 Play","Infinix Hot 10","Infinix Smart 9","Infinix Smart 8","Infinix Smart 7","Infinix Smart 6","Infinix Smart 5","Outro modelo"],
+"Tecno":["Tecno Phantom V Fold 2","Tecno Phantom V Flip 2","Tecno Phantom X2 Pro","Tecno Phantom X2","Tecno Camon 40 Premier","Tecno Camon 40 Pro","Tecno Camon 40","Tecno Camon 30 Premier","Tecno Camon 30 Pro","Tecno Camon 30","Tecno Camon 20 Pro","Tecno Camon 20","Tecno Camon 19 Pro","Tecno Camon 19","Tecno Camon 18 Premier","Tecno Camon 18","Tecno Pova 6 Pro","Tecno Pova 6","Tecno Pova 5 Pro","Tecno Pova 5","Tecno Pova 4 Pro","Tecno Pova 4","Tecno Pova 3","Tecno Pova 2","Tecno Spark 30 Pro","Tecno Spark 30","Tecno Spark 20 Pro+","Tecno Spark 20 Pro","Tecno Spark 20","Tecno Spark 10 Pro","Tecno Spark 10","Tecno Spark 9 Pro","Tecno Spark 8","Tecno Spark 7","Tecno Pop 9","Tecno Pop 8","Tecno Pop 7","Tecno Pop 6","Outro modelo"],
+"Positivo":["Positivo Twist 5 Pro","Positivo Twist 5","Positivo Twist 4 Pro","Positivo Twist 4","Positivo Twist 3 Pro","Positivo Twist 3","Positivo Twist 2 Pro","Positivo Twist 2","Positivo Twist Tab","Positivo Q20","Positivo Q10","Positivo S572","Positivo S533","Positivo S515","Positivo Mini","Outro modelo"],
+"Multilaser":["Multilaser G Max 2","Multilaser G Max","Multilaser G Pro 2","Multilaser G Pro","Multilaser G 2","Multilaser G","Multilaser F Pro 2","Multilaser F Pro","Multilaser E Lite 2","Multilaser E Lite","Multilaser MS70","Multilaser MS60F","Multilaser MS50","Outro modelo"],
+"Lenovo":["Lenovo Legion Phone Duel 2","Lenovo Legion Phone Duel","Lenovo Legion Y70","Lenovo Legion Y90","Lenovo K14 Plus","Lenovo K13","Lenovo K12 Pro","Lenovo K10 Note","Lenovo Z6 Pro","Lenovo Z5 Pro","Lenovo Tab P12","Lenovo Tab P11","Lenovo Tab M10","Outro modelo"],
+"Meizu":["Meizu 21 Pro","Meizu 21","Meizu 20 Pro","Meizu 20","Meizu 18 Pro","Meizu 18","Meizu 17 Pro","Meizu 17","Meizu 16s Pro","Meizu 16","Meizu Note 9","Meizu M10","Meizu C9","Outro modelo"],
+"Sharp":["Sharp Aquos R9 Pro","Sharp Aquos R9","Sharp Aquos R8 Pro","Sharp Aquos R8","Sharp Aquos R7","Sharp Aquos R6","Sharp Aquos Sense 9","Sharp Aquos Sense 8","Sharp Aquos Sense 7","Sharp Aquos Zero 6","Outro modelo"],
+"Alcatel":["Alcatel 3X (2020)","Alcatel 3L (2021)","Alcatel 1S (2021)","Alcatel 1B","Alcatel 1V","Alcatel 1","Alcatel 5V","Alcatel 3V","Outro modelo"],
+"Blu":["Blu G91 Pro","Blu G91 Max","Blu G91","Blu G71","Blu G61","Blu G51","Blu View 3","Blu View 2","Blu C6","Outro modelo"]
 };
 
-function atualizarModelos() {
-  const marcaSelect = document.getElementById('marca');
-  const modeloSelect = document.getElementById('modelo');
-  const marca = marcaSelect.value;
+/* ====================== ESTADO ====================== */
+const state = { brand:"", model:"", style:"equilibrado", nonce:0, hl:-1 };
+const FLAT = [];
+for (const b in DB) for (const m of DB[b]) FLAT.push({brand:b, model:m});
 
-  modeloSelect.innerHTML = '<option value="">Selecione o modelo</option>';
-  if (marca) {
-    const modelosMarca = modelos[marca];
-    modelosMarca.forEach(modelo => {
-      const option = document.createElement('option');
-      option.value = modelo;
-      option.textContent = modelo;
-      modeloSelect.appendChild(option);
-    });
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+$("#stModels").textContent = FLAT.length.toLocaleString("pt-BR");
+$("#stBrands").textContent = Object.keys(DB).length;
+
+/* ====================== TOAST ====================== */
+let toastT;
+function toast(msg){
+  $("#toastMsg").textContent = msg;
+  $("#toast").classList.add("show");
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>$("#toast").classList.remove("show"), 2600);
+}
+
+/* ====================== TABS ====================== */
+function switchTab(which){
+  $(".tabs").dataset.active = which;
+  const sensi = which === "sensi";
+  $("#tabSensi").setAttribute("aria-selected", sensi);
+  $("#tabAux").setAttribute("aria-selected", !sensi);
+  $("#panelSensi").hidden = !sensi;
+  $("#panelAux").hidden = sensi;
+}
+$("#tabSensi").addEventListener("click", ()=>switchTab("sensi"));
+$("#tabAux").addEventListener("click", ()=>switchTab("auxilio"));
+
+/* ====================== MARCAS ====================== */
+const brandsEl = $("#brands");
+["Todas", ...Object.keys(DB)].forEach((b,i)=>{
+  const el = document.createElement("button");
+  el.type = "button";
+  el.className = "brand" + (i===0 ? " on" : "");
+  el.textContent = b;
+  el.addEventListener("click", ()=>{
+    $$(".brand").forEach(x=>x.classList.remove("on"));
+    el.classList.add("on");
+    state.brand = (b === "Todas") ? "" : b;
+    state.model = "";
+    $("#modelInput").value = "";
+    $("#combo").classList.remove("filled");
+    $("#result").classList.remove("show");
+    renderList("");
+    openList();
+    $("#modelInput").focus({preventScroll:true});
+  });
+  brandsEl.appendChild(el);
+});
+
+/* ====================== BUSCA DE MODELOS ====================== */
+const listEl = $("#modelList"), inputEl = $("#modelInput");
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+
+function poolList(){
+  return state.brand ? DB[state.brand].map(m=>({brand:state.brand, model:m})) : FLAT;
+}
+function highlight(text, q){
+  if(!q) return text;
+  const i = norm(text).indexOf(norm(q));
+  if(i < 0) return text;
+  return text.slice(0,i) + "<mark>" + text.slice(i, i+q.length) + "</mark>" + text.slice(i+q.length);
+}
+function renderList(q){
+  const terms = norm(q).split(/\s+/).filter(Boolean);
+  const src = poolList();
+  const hits = terms.length
+    ? src.filter(d => { const t = norm(d.brand + " " + d.model); return terms.every(w => t.includes(w)); })
+    : src;
+
+  state.hl = -1;
+  listEl.innerHTML = "";
+
+  if(!hits.length){
+    listEl.innerHTML = '<div class="empty">Nenhum aparelho encontrado.<br>Tente outro nome ou escolha "Outro modelo".</div>';
+    return;
+  }
+  const shown = hits.slice(0, 70);
+  const frag = document.createDocumentFragment();
+  shown.forEach(d=>{
+    const o = document.createElement("div");
+    o.className = "opt";
+    o.setAttribute("role","option");
+    o.innerHTML = '<span>' + highlight(d.model, q) + '</span><small>' + d.brand + '</small>';
+    o.addEventListener("click", ()=>pickDevice(d));
+    frag.appendChild(o);
+  });
+  listEl.appendChild(frag);
+  if(hits.length > shown.length){
+    const more = document.createElement("div");
+    more.className = "more";
+    more.textContent = "Mostrando " + shown.length + " de " + hits.length + " — refine a busca";
+    listEl.appendChild(more);
   }
 }
-
-function gerarSensibilidade() {
-  const modeloSelect = document.getElementById('modelo');
-  const resultado = document.getElementById('resultado');
-  const modelo = modeloSelect.value;
-
-  if (modelo) {
-    const geral = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
-    const pontoVermelho = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
-    const mira2x = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
-    const mira4x = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
-    const tamanhoBotao = Math.floor(Math.random() * (63 - 45 + 1)) + 45;
-
-    resultado.innerHTML = `
-      <strong>Modelo:</strong> ${modelo}<br>
-      <strong>Geral:</strong> ${geral}<br>
-      <strong>Ponto Vermelho:</strong> ${pontoVermelho}<br>
-      <strong>Mira 2x:</strong> ${mira2x}<br>
-      <strong>Mira 4x:</strong> ${mira4x}<br>
-      <strong>Tamanho do Botão:</strong> ${tamanhoBotao}
-    `;
-    resultado.style.display = 'block';
-  } else {
-    resultado.style.display = 'none';
-  }
+function pickDevice(d){
+  state.brand = d.brand;
+  state.model = d.model;
+  inputEl.value = d.model;
+  $("#combo").classList.add("filled");
+  closeList();
+  $$(".brand").forEach(x=>x.classList.toggle("on", x.textContent === d.brand));
+  const chip = $$(".brand").find(x=>x.textContent === d.brand);
+  if(chip) chip.scrollIntoView({block:"nearest", inline:"center", behavior:"smooth"});
 }
+function openList(){ listEl.classList.add("open"); inputEl.setAttribute("aria-expanded","true"); }
+function closeList(){ listEl.classList.remove("open"); inputEl.setAttribute("aria-expanded","false"); }
 
-function mostrar(menu) {
-  document.getElementById('sensi').style.display = (menu === 'sensi') ? 'block' : 'none';
-  document.getElementById('auxilio').style.display = (menu === 'auxilio') ? 'block' : 'none';
-  document.getElementById('btnSensi').classList.toggle('active', menu === 'sensi');
-  document.getElementById('btnAuxilio').classList.toggle('active', menu === 'auxilio');
-}
+inputEl.addEventListener("input", e=>{
+  state.model = "";
+  $("#combo").classList.toggle("filled", !!e.target.value);
+  renderList(e.target.value);
+  openList();
+});
+inputEl.addEventListener("focus", ()=>{ renderList(inputEl.value); openList(); });
+inputEl.addEventListener("keydown", e=>{
+  const opts = [...listEl.querySelectorAll(".opt")];
+  if(e.key === "ArrowDown" || e.key === "ArrowUp"){
+    e.preventDefault();
+    if(!opts.length) return;
+    state.hl = e.key === "ArrowDown" ? (state.hl + 1) % opts.length : (state.hl - 1 + opts.length) % opts.length;
+    opts.forEach(o=>o.classList.remove("hl"));
+    opts[state.hl].classList.add("hl");
+    opts[state.hl].scrollIntoView({block:"nearest"});
+  } else if(e.key === "Enter"){
+    e.preventDefault();
+    if(state.hl >= 0 && opts[state.hl]) opts[state.hl].click();
+    else if(opts.length === 1) opts[0].click();
+    else if(state.model) generate();
+  } else if(e.key === "Escape"){ closeList(); inputEl.blur(); }
+});
+$("#clearBtn").addEventListener("click", ()=>{
+  inputEl.value = ""; state.model = "";
+  $("#combo").classList.remove("filled");
+  renderList(""); openList(); inputEl.focus();
+});
+document.addEventListener("pointerdown", e=>{ if(!$("#combo").contains(e.target)) closeList(); });
 
-function injetarAuxilio() {
-  const progressBar = document.getElementById('progress-bar');
-  const progressBarInner = document.getElementById('progress-bar-inner');
-  const injectionMessage = document.getElementById('injection-message');
-
-  progressBar.style.display = 'block';
-  injectionMessage.style.display = 'none';
-
-  let width = 0;
-  const interval = setInterval(function() {
-    if (width >= 100) {
-      clearInterval(interval);
-      injectionMessage.style.display = 'block';
-    } else {
-      width++;
-      progressBarInner.style.width = width + '%';
+/* ====================== DETECTAR APARELHO ====================== */
+$("#detectBtn").addEventListener("click", async ()=>{
+  let guess = "";
+  try{
+    if(navigator.userAgentData && navigator.userAgentData.getHighEntropyValues){
+      const d = await navigator.userAgentData.getHighEntropyValues(["model"]);
+      guess = (d.model || "").trim();
     }
-  }, 30);
-}
-</script>
+  }catch(_){}
+  if(!guess){
+    const ua = navigator.userAgent;
+    const m = ua.match(/Android[^;]*;\s*([^;)]+?)\s*(?:Build|\))/i);
+    if(m) guess = m[1].trim();
+    else if(/iPhone/i.test(ua)) guess = "iPhone";
+    else if(/iPad/i.test(ua)) guess = "iPad";
+  }
+  if(!guess){ toast("Não deu pra detectar. Busque manualmente."); return; }
 
+  const g = norm(guess);
+  const hit = FLAT.find(d => norm(d.model) === g)
+           || FLAT.find(d => norm(d.model).includes(g) || g.includes(norm(d.model)));
+  if(hit){
+    pickDevice(hit);
+    toast("Detectado: " + hit.model);
+  }else{
+    state.brand = "";
+    $$(".brand").forEach((x,i)=>x.classList.toggle("on", i===0));
+    inputEl.value = guess;
+    $("#combo").classList.add("filled");
+    renderList(guess); openList();
+    toast("Achamos: " + guess + ". Confirme na lista.");
+  }
+});
+
+/* ====================== ESTILO DE JOGO ====================== */
+$$(".style").forEach(el=>{
+  el.addEventListener("click", ()=>{
+    $$(".style").forEach(x=>x.classList.remove("on"));
+    el.classList.add("on");
+    state.style = el.dataset.style;
+    if(state.model && $("#result").classList.contains("show")) generate(true);
+  });
+});
+
+/* ====================== MOTOR DE SENSIBILIDADE ====================== */
+function hash(str){
+  let h = 2166136261;
+  for(let i=0;i<str.length;i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function rng(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const TOP = /ultra|pro max|pro\+|fold|flip|rog|red ?magic|legion|gt |gt neo|find x|magic \d|mate \d0|xperia 1|iqoo|black shark|k[4-8]0|poco f|turbo|premier|phantom|axon \d0 ultra|nubia z/i;
+const MID = /pro|plus|\+|note \d|edge|reno|nova|zenfone|pixel \d|galaxy a[3-7]|galaxy m[3-5]|camon|zero|neo|fe$|k\d0|x\d0/i;
+const OLD = /iphone (6|7|8|x)|galaxy (s[789]|j\d|a[0-2]\d)|moto (e|g[2-7])|redmi (5|6|7|8|9)|note (4|5|6|7)|lg |xperia z|nokia [1-5]|alcatel|blu |positivo|multilaser|hot 1[01]|smart [5-7]|pop \d/i;
+
+function tierOf(name){
+  if(TOP.test(name)) return {t:"top", label:"Alto desempenho"};
+  if(OLD.test(name)) return {t:"low", label:"Entrada / antigo"};
+  if(MID.test(name)) return {t:"mid", label:"Intermediário"};
+  return {t:"mid", label:"Intermediário"};
+}
+const STYLE_MOD = {
+  agressivo:  { geral: 12, dot: 10, x2: 8,  x4: -4,  awm: -8,  free: 10, btn: 3 },
+  equilibrado:{ geral: 0,  dot: 0,  x2: 0,  x4: 0,   awm: 0,   free: 0,  btn: 0 },
+  precisao:   { geral:-10, dot:-6,  x2:-8,  x4:-14,  awm:-18,  free:-6,  btn:-3 }
+};
+const TIER_MOD = { top:{base:6, btn:-2}, mid:{base:0, btn:0}, low:{base:-5, btn:4} };
+const clamp = (v,a,b)=>Math.max(a, Math.min(b, Math.round(v)));
+
+function build(){
+  const key = state.brand + "|" + state.model + "|" + state.style + "|" + state.nonce;
+  const r = rng(hash(key));
+  const tier = tierOf(state.model);
+  const sm = STYLE_MOD[state.style], tm = TIER_MOD[tier.t];
+  const val = (min,max,mod)=>clamp(min + r()*(max-min) + mod + tm.base, 40, 200);
+
+  const vals = {
+    "Geral":          val(150, 200, sm.geral),
+    "Ponto Vermelho": val(145, 200, sm.dot),
+    "Mira 2x":        val(130, 190, sm.x2),
+    "Mira 4x":        val(110, 175, sm.x4),
+    "Mira AWM":       val(85, 150, sm.awm),
+    "Olhar Livre":    val(95, 165, sm.free)
+  };
+  const dpi = clamp(430 + r()*370 + (tier.t==="low" ? -40 : 0), 400, 820);
+  const btn = clamp(46 + r()*16 + sm.btn + tm.btn, 42, 68);
+  const graphics = tier.t==="top" ? "Ultra" : tier.t==="mid" ? "Alta" : "Suave";
+  const fps = tier.t==="top" ? "Extremo (90–120)" : tier.t==="mid" ? "Alto (60)" : "Médio (45–60)";
+  return {vals, dpi, btn, graphics, fps, tier};
+}
+
+const STYLE_NAME = {agressivo:"Rush / curta distância", equilibrado:"Equilibrado / geral", precisao:"Sniper / longa distância"};
+let lastCfg = null;
+
+function countUp(el, to){
+  const dur = 750, t0 = performance.now();
+  (function step(t){
+    const p = Math.min(1, (t - t0)/dur);
+    el.textContent = Math.round(to * (1 - Math.pow(1-p, 3)));
+    if(p < 1) requestAnimationFrame(step);
+  })(t0);
+}
+function renderResult(cfg){
+  $("#resModel").textContent = state.model === "Outro modelo" ? (state.brand + " (outro modelo)") : state.model;
+  $("#resTag").textContent = state.brand + " · " + cfg.tier.label;
+
+  const bars = $("#bars");
+  bars.innerHTML = "";
+  Object.entries(cfg.vals).forEach(([k,v])=>{
+    const row = document.createElement("div");
+    row.className = "bar-row";
+    row.innerHTML = '<span class="k">'+k+'</span><span class="v">0</span><div class="track"><div class="fill"></div></div>';
+    bars.appendChild(row);
+    requestAnimationFrame(()=>{ row.querySelector(".fill").style.width = (v/200*100) + "%"; });
+    countUp(row.querySelector(".v"), v);
+  });
+
+  $("#extras").innerHTML =
+    '<div class="chip"><span>DPI recomendado</span><b>'+cfg.dpi+'</b></div>'+
+    '<div class="chip"><span>Botão de tiro</span><b>'+cfg.btn+'</b></div>'+
+    '<div class="chip"><span>Gráficos</span><b>'+cfg.graphics+'</b></div>'+
+    '<div class="chip"><span>Taxa de quadros</span><b>'+cfg.fps+'</b></div>';
+}
+function generate(silent){
+  if(!state.model){
+    toast("Escolha o seu aparelho primeiro.");
+    inputEl.focus({preventScroll:true});
+    renderList(inputEl.value); openList();
+    return;
+  }
+  if(silent){ lastCfg = build(); renderResult(lastCfg); return; }
+
+  const btn = $("#genBtn"), original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg> CALCULANDO...';
+  setTimeout(()=>{
+    btn.disabled = false;
+    btn.innerHTML = original;
+    lastCfg = build();
+    renderResult(lastCfg);
+    $("#result").classList.add("show");
+    $("#result").scrollIntoView({behavior:"smooth", block:"nearest"});
+  }, 950);
+}
+$("#genBtn").addEventListener("click", ()=>generate());
+$("#againBtn").addEventListener("click", ()=>{
+  state.nonce++;
+  lastCfg = build();
+  renderResult(lastCfg);
+  toast("Nova variação gerada!");
+});
+$("#copyBtn").addEventListener("click", async ()=>{
+  if(!lastCfg) return;
+  const txt =
+    "SENSIBILIDADE — " + state.model + " (" + state.brand + ")\n" +
+    "Estilo: " + STYLE_NAME[state.style] + "\n\n" +
+    Object.entries(lastCfg.vals).map(([k,v])=>k + ": " + v).join("\n") + "\n\n" +
+    "DPI: " + lastCfg.dpi + "\nBotão de tiro: " + lastCfg.btn +
+    "\nGráficos: " + lastCfg.graphics + "\nFPS: " + lastCfg.fps +
+    "\n\nGerado em andezinsensi.shop";
+  try{
+    await navigator.clipboard.writeText(txt);
+    toast("Sensibilidade copiada!");
+  }catch(_){
+    const ta = document.createElement("textarea");
+    ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); toast("Sensibilidade copiada!"); }
+    catch(e){ toast("Não foi possível copiar."); }
+    ta.remove();
+  }
+});
+
+/* ====================== OTIMIZAÇÃO ====================== */
+$$(".opt-card").forEach(card=>{
+  const cb = card.querySelector("input");
+  cb.addEventListener("change", ()=>card.classList.toggle("on", cb.checked));
+});
+const STEPS = {
+  calibrar:["Lendo taxa de toque da tela...","Calibrando curva de sensibilidade..."],
+  recuo:["Analisando padrão de recuo...","Aplicando estabilização vertical..."],
+  precisao:["Medindo precisão do rastreio...","Refinando resposta da mira..."],
+  inputlag:["Verificando fila de renderização...","Reduzindo latência de toque..."],
+  fps:["Liberando memória em segundo plano...","Fixando taxa de quadros..."]
+};
+let injRunning = false;
+$("#injBtn").addEventListener("click", ()=>{
+  if(injRunning) return;
+  const chosen = $$(".opt-card").filter(c=>c.querySelector("input").checked);
+  if(!chosen.length){ toast("Selecione pelo menos uma opção."); return; }
+
+  injRunning = true;
+  const btn = $("#injBtn"), original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg> APLICANDO...';
+
+  const log = $("#log"), fill = $("#pfill"), done = $("#done");
+  log.innerHTML = ""; fill.style.width = "0%";
+  done.classList.remove("show");
+  $("#console").classList.add("show");
+
+  const lines = [];
+  chosen.forEach(c=>{ (STEPS[c.dataset.k] || []).forEach(s=>lines.push(s)); });
+  lines.push("Gravando perfil otimizado...");
+
+  let i = 0;
+  const total = lines.length;
+  (function tick(){
+    if(i < total){
+      const d = document.createElement("div");
+      d.innerHTML = '<span class="hl">&gt;</span> ' + lines[i];
+      log.appendChild(d);
+      log.scrollTop = log.scrollHeight;
+      i++;
+      fill.style.width = (i/total*100) + "%";
+      setTimeout(tick, 520 + Math.random()*280);
+    }else{
+      const d = document.createElement("div");
+      d.className = "ok";
+      d.textContent = "✓ Perfil aplicado com sucesso.";
+      log.appendChild(d);
+      log.scrollTop = log.scrollHeight;
+      done.classList.add("show");
+      done.scrollIntoView({behavior:"smooth", block:"nearest"});
+      btn.disabled = false;
+      btn.innerHTML = original;
+      injRunning = false;
+    }
+  })();
+});
+
+/* ====================== PARTÍCULAS ====================== */
+(function(){
+  const cv = document.getElementById("fx");
+  if(!cv) return;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const fine = matchMedia("(pointer: fine)").matches;
+  const ctx = cv.getContext("2d", {alpha:true});
+  let W=0, H=0, dpr=1, parts=[], raf=0, mouse={x:-999, y:-999};
+
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = Math.floor(W*dpr); cv.height = Math.floor(H*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    const n = Math.max(24, Math.min(78, Math.round(W*H/17000)));
+    parts = Array.from({length:n}, ()=>({
+      x: Math.random()*W, y: Math.random()*H,
+      vx: (Math.random()-.5)*.32, vy: (Math.random()-.5)*.32,
+      r: Math.random()*1.6 + .7
+    }));
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const LINK = 128;
+    for(let i=0;i<parts.length;i++){
+      const p = parts[i];
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < -20) p.x = W+20; if(p.x > W+20) p.x = -20;
+      if(p.y < -20) p.y = H+20; if(p.y > H+20) p.y = -20;
+      for(let j=i+1;j<parts.length;j++){
+        const q = parts[j], dx = p.x-q.x, dy = p.y-q.y, d2 = dx*dx + dy*dy;
+        if(d2 < LINK*LINK){
+          const a = (1 - Math.sqrt(d2)/LINK) * .16;
+          ctx.strokeStyle = "rgba(150,170,255," + a.toFixed(3) + ")";
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(q.x,q.y); ctx.stroke();
+        }
+      }
+      if(fine){
+        const mdx = p.x-mouse.x, mdy = p.y-mouse.y, md2 = mdx*mdx + mdy*mdy;
+        if(md2 < 26000){
+          const a = (1 - Math.sqrt(md2)/162) * .38;
+          ctx.strokeStyle = "rgba(18,216,255," + a.toFixed(3) + ")";
+          ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(mouse.x,mouse.y); ctx.stroke();
+        }
+      }
+      ctx.fillStyle = "rgba(255,255,255,.42)";
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.283); ctx.fill();
+    }
+    raf = requestAnimationFrame(draw);
+  }
+  function start(){ if(!raf) raf = requestAnimationFrame(draw); }
+  function stop(){ cancelAnimationFrame(raf); raf = 0; }
+
+  resize();
+  if(reduce){ draw(); stop(); } else start();
+
+  let rt;
+  addEventListener("resize", ()=>{ clearTimeout(rt); rt = setTimeout(resize, 180); });
+  document.addEventListener("visibilitychange", ()=>{ document.hidden ? stop() : (!reduce && start()); });
+  if(fine){
+    addEventListener("pointermove", e=>{ mouse.x = e.clientX; mouse.y = e.clientY; });
+    addEventListener("pointerleave", ()=>{ mouse.x = mouse.y = -999; });
+  }
+})();
+
+renderList("");
+</script>
 </body>
 </html>
